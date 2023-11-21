@@ -560,3 +560,34 @@ EOT;
         return $icon;
     }
 }
+
+if (!function_exists('build_randstr')) {
+	/**
+	 * 生成随机字符串
+	 * @param int $length 长度
+	 * @param bool $special 是否包含特殊字符
+	 * @return string 随机字符串
+	 */
+	function build_randstr(int $length = 8, bool $special = false)
+	{
+		$chars = array(
+			'abcdefghijklmnopqrstuvwxyz',
+			'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+			'0123456789'
+		);
+
+		if ($special) {
+			$chars = array_merge($chars, array(
+				'~!@#$%^&*()_+{}[]|'
+			));
+		}
+
+		$chars = implode('', $chars);
+		$chars = str_shuffle($chars);
+		$str = substr($chars, 0, $length);
+		for ($i = 0; $i < $length; $i++) {
+			$str .= $chars[mt_rand(0, strlen($chars) - 1)];
+		}
+		return str_shuffle($str);
+	}
+}

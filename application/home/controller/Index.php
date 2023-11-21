@@ -1,0 +1,122 @@
+<?php
+
+namespace app\home\controller;
+
+use app\common\model\business\Source;
+use think\Controller;
+use think\Exception;
+
+class Index extends Controller
+{
+	protected $BusinessModel = null;
+
+	public function _initialize()
+	{
+		$this->BusinessModel = model('app\common\model\business\Business');
+	}
+
+	public function index(): string
+	{
+		try {
+			return $this->view->fetch();
+		} catch (Exception $e) {
+			return $e->getMessage();
+		}
+	}
+
+	public function login()
+	{
+		if ($this->request->isPost()) {
+			$mobile = $this->request->param('mobile', '', 'trim');
+			$password = $this->request->param('password', '', 'trim');
+
+			if (empty($mobile) || empty($password)) {
+				$this->error('手机号或密码不能为空');
+			}
+
+			$business = $this->BusinessModel->where('mobile', $mobile)->find();
+
+			if (!$business) {
+				$this->error('手机号未注册');
+			}
+
+			$password = md5(md5($password) . $business['salt']);
+
+			if ($password != $business['password']) {
+				$this->error('密码错误');
+			}
+
+			$data = [
+				'id' => $business['id'],
+				'nickname' => $business['nickname'],
+				'mobile' => $business['mobile'],
+				'avatar' => $business['avatar'],
+				'auth' => $business['auth'],
+			];
+
+			cookie('business', $data, 3600 * 24 * 7);
+
+			$this->success('登录成功', url('home/business/index'));
+		}
+
+		return $this->fetch();
+	}
+
+	public function logout()
+	{
+		cookie('business', null);
+
+		$this->success('退出成功', url('home/index/index'));
+	}
+
+	public function register()
+	{
+		if ($this->request->isPost()) {
+			$mobile = $this->request->param('mobile', '', 'trim');
+			$password = $this->request->param('password', '', 'trim');
+			$rePassword = $this->request->param('rePassword', '', 'trim');
+
+			if (empty($mobile) || empty($password) || empty($rePassword)) {
+				$this->error('手机号或密码不能为空');
+			}
+
+			if ($password != $rePassword) {
+				$this->error('两次密码不一致');
+			}
+
+			$business = $this->BusinessModel->where('mobile', $mobile)->find();
+
+			if ($business) {
+				$this->error('手机号已注册');
+			}
+
+			$salt = build_randstr(6);
+			$password = md5(md5($password) . $salt);
+
+			$data = [
+				'mobile' => $mobile,
+				'password' => $password,
+				'salt' => $salt,
+				'auth' => 0,
+				'money' => 0,
+				'deal' => 0,
+			];
+
+			$source = Source::where(['name' => ['like', '%云课堂%']])->find();
+
+			if ($source) {
+				$data['source_id'] = $source['id'];
+			}
+
+			$result = $this->BusinessModel->validate('common/Business.register')->save($data);
+
+			if ($result === false) {
+				$this->error($this->BusinessModel->getError());
+			} else {
+				$this->success('注册成功', url('home/index/register'));
+			}
+		}
+
+		return $this->fetch();
+	}
+}
