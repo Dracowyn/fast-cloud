@@ -17,3 +17,5 @@ composer.lock
 node_modules
 .user.ini
 /application/config.php
+/application/database.php
+/application/extra/site.php
