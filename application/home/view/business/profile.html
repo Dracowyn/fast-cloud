@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="/assets/css/profile.css">
+<link rel="stylesheet" href="/assets/libs/fastadmin-citypicker/dist/css/city-picker.css">
+
+<div class="user">
+    <div class="avatar wow fadeInUp">
+        <img src="/assets/images/avatar.jpg" />
+    </div>
+</div>
+
+<form class="mui-input-group">
+    <div class="mui-input-row">
+        <label>昵称</label>
+        <input type="text" class="mui-input-clear" placeholder="请输入昵称">
+    </div>
+    <div class="mui-input-row">
+        <label>手机号码</label>
+        <input type="text" class="mui-input-clear" placeholder="请输入手机号码" value="{$business['mobile']}">
+    </div>
+    <div class="mui-input-row">
+        <label>邮箱</label>
+        <input type="text" class="mui-input-clear" placeholder="请输入邮箱">
+    </div>
+    <div class="mui-input-row">
+        <label>密码</label>
+        <input type="password" class="mui-input-password" placeholder="请输入密码">
+    </div>
+    <div class="mui-input-row">
+        <label>性别</label>
+        <label>
+            <select name="gender">
+                <option value="0">保密</option>
+                <option value="1">男</option>
+                <option value="2">女</option>
+            </select>
+        </label>
+    </div>
+    <div class="mui-input-row region">
+        <label>地区</label>
+        <div class="citypicker">
+            <label for="city"></label>
+            <input id="city" type="text" data-toggle="city-picker" name="region" readonly />
+        </div>
+    </div>
+
+    <input type="file" class="form-control" id="avatar" name="avatar" style="display: none;" />
+
+    <div class="mui-button-row">
+        <button type="button" class="mui-btn mui-btn-primary">确认</button>
+        <button type="button" class="mui-btn mui-btn-danger" onclick="history.go(-1)">返回</button>
+    </div>
+</form>
+<script src="/assets/libs/fastadmin-citypicker/dist/js/city-picker.data.min.js"></script>
+<script src="/assets/libs/fastadmin-citypicker/dist/js/city-picker.min.js"></script>

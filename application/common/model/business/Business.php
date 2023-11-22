@@ -21,4 +21,20 @@ class Business extends Model
 
 	// 定义更新时间的字段名
 	protected $updateTime = 'update_time';
+
+	// 追加数据表的不存在字段
+	protected $append = [
+		'mobile_text'
+	];
+
+	/**
+	 * 手机号的获取器
+	 * @param String|Int $value 当前字段名的值
+	 * @param array $data 当前整行数据
+	 */
+	public function getMobileTextAttr($value, array $data)
+	{
+		$mobile = $data['mobile'] ?? '';
+		return substr_replace($mobile, '****', 3, 4);
+	}
 }

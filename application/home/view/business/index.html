@@ -3,17 +3,17 @@
 <!-- 头部 -->
 <div class="user">
     <div class="avatar wow fadeInUp">
-        <img src="/assets/images/avatar.jpg" />
+        <img src="{$business.avatar ? $business.avatar : '/assets/images/avatar.jpg'}"  alt="avatar"/>
     </div>
 
-    <div class="nickname wow fadeInUp" data-wow-delay="100ms">Dracowyn</div>
+    <div class="nickname wow fadeInUp" data-wow-delay="100ms">{$business.nickname ?: $business.mobile_text}</div>
 
     <a href="index/login" class="login wow fadeInUp" data-wow-delay="200ms">登录</a>
 </div>
 
 <!-- 菜单 -->
 <div class="menulist wow fadeInUp" data-wow-delay="300ms">
-    <a href="profile.html" class="item">
+    <a href="{:url('/home/business/profile')}" class="item">
         <span>基本资料</span>
         <img src='/assets/images/row.png' />
     </a>

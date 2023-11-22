@@ -4,7 +4,10 @@ namespace app\home\controller;
 
 use app\common\model\business\Source;
 use think\Controller;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
 use think\Exception;
+use think\exception\DbException;
 
 class Index extends Controller
 {
@@ -102,7 +105,11 @@ class Index extends Controller
 				'deal' => 0,
 			];
 
-			$source = Source::where(['name' => ['like', '%云课堂%']])->find();
+			$source = null;
+			try {
+				$source = (new Source)->where(['name' => ['like', '%云课堂%']])->find();
+			} catch (DataNotFoundException|ModelNotFoundException|DbException $e) {
+			}
 
 			if ($source) {
 				$data['source_id'] = $source['id'];

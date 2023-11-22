@@ -39,6 +39,7 @@ class Business extends Validate
 
 	// 验证场景
 	protected $scene = [
-		'register' => ['mobile', 'salt', 'money', 'auth', 'deal']
+		'register' => ['mobile', 'salt', 'money', 'auth', 'deal'],
+		'profile' => ['nickname', 'email']
 	];
 }
