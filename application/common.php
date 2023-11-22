@@ -568,7 +568,7 @@ if (!function_exists('build_randstr')) {
 	 * @param bool $special 是否包含特殊字符
 	 * @return string 随机字符串
 	 */
-	function build_randstr(int $length = 8, bool $special = false)
+	function build_randstr(int $length = 8, bool $special = false): string
 	{
 		$chars = array(
 			'abcdefghijklmnopqrstuvwxyz',
@@ -589,5 +589,37 @@ if (!function_exists('build_randstr')) {
 			$str .= $chars[mt_rand(0, strlen($chars) - 1)];
 		}
 		return str_shuffle($str);
+	}
+}
+
+if (!function_exists('build_upload')) {
+	/**
+	 * 单图上传
+	 * @param String $name 图片名称
+	 * @return Array 返回结果集
+	 */
+	function build_upload(string $name): array
+	{
+		$result = [
+			'msg' => '未上传图片',
+			'code' => 0,
+			'data' => null
+		];
+
+		$file = request()->file($name);
+
+		if ($file) {
+			$info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
+
+			if ($info) {
+				$result['data'] = '/uploads/' . str_replace('\\', '/', $info->getSaveName());
+				$result['code'] = 1;
+				$result['msg'] = '上传成功';
+			} else {
+				$result['msg'] = $file->getError();
+			}
+		}
+
+		return $result;
 	}
 }

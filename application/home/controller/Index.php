@@ -15,7 +15,7 @@ class Index extends Controller
 
 	public function _initialize()
 	{
-		$this->BusinessModel = model('app\common\model\business\Business');
+		$this->BusinessModel = model('business.Business');
 	}
 
 	public function index(): string
@@ -67,9 +67,10 @@ class Index extends Controller
 
 	public function logout()
 	{
-		cookie('business', null);
-
-		$this->success('退出成功', url('home/index/index'));
+		if ($this->request->isAjax()) {
+			cookie('business', null);
+			$this->success('退出成功', url('home/index/index'));
+		}
 	}
 
 	public function register()

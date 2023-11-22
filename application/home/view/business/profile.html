@@ -2,52 +2,78 @@
 <link rel="stylesheet" href="/assets/libs/fastadmin-citypicker/dist/css/city-picker.css">
 
 <div class="user">
-    <div class="avatar wow fadeInUp">
-        <img src="/assets/images/avatar.jpg" />
+    <div class="avatar wow fadeInUp" onclick="avatar.click();">
+        <img src="/assets/images/avatar.jpg" alt="avatar"/>
     </div>
 </div>
 
-<form class="mui-input-group">
+<form class="mui-input-group" method="post" enctype="multipart/form-data">
     <div class="mui-input-row">
-        <label>昵称</label>
-        <input type="text" class="mui-input-clear" placeholder="请输入昵称">
+        <label for="nickname">昵称</label>
+        <input type="text" class="mui-input-clear" name="nickname" id="nickname" placeholder="请输入昵称"
+               value="{$business.nickname}">
     </div>
     <div class="mui-input-row">
-        <label>手机号码</label>
-        <input type="text" class="mui-input-clear" placeholder="请输入手机号码" value="{$business['mobile']}">
+        <label for="mobile">手机号码</label>
+        <input type="text" class="mui-input-clear" name="mobile" id="mobile" placeholder="请输入手机号码" readonly
+               value="{$business['mobile']}">
     </div>
     <div class="mui-input-row">
-        <label>邮箱</label>
-        <input type="text" class="mui-input-clear" placeholder="请输入邮箱">
+        <label for="email">邮箱</label>
+        <input type="text" class="mui-input-clear" name="email" id="email" placeholder="请输入邮箱"
+               value="{$business.email}">
     </div>
     <div class="mui-input-row">
-        <label>密码</label>
-        <input type="password" class="mui-input-password" placeholder="请输入密码">
+        <label for="password">密码</label>
+        <input type="password" class="mui-input-password" name="password" id="password"
+               placeholder="密码为空就不修改密码">
     </div>
     <div class="mui-input-row">
-        <label>性别</label>
-        <label>
-            <select name="gender">
-                <option value="0">保密</option>
-                <option value="1">男</option>
-                <option value="2">女</option>
-            </select>
-        </label>
+        <label for="gender">性别</label>
+        <select name="gender" id="gender">
+            <option value="0" {$business.gender== 0 ?
+            'selected' : ''}>保密</option>
+            <option value="1" {$business.gender== 1 ?
+            'selected' : ''}>男</option>
+            <option value="2" {$business.gender== 2 ?
+            'selected' : ''}>女</option>
+        </select>
     </div>
+
     <div class="mui-input-row region">
-        <label>地区</label>
+        <label for="region">地区</label>
         <div class="citypicker">
-            <label for="city"></label>
-            <input id="city" type="text" data-toggle="city-picker" name="region" readonly />
+            <input type="text" id="region" data-toggle="city-picker" name="region" readonly
+                   value="{$business.district ? $business.district : ($business.city ? $business.city : $business.province)}"/>
+            <input type="hidden" name="code" id="code"
+                   value="{$business.district ? $business.district : ($business.city ? $business.city : $business.province)}">
         </div>
     </div>
 
     <input type="file" class="form-control" id="avatar" name="avatar" style="display: none;" />
 
     <div class="mui-button-row">
-        <button type="button" class="mui-btn mui-btn-primary">确认</button>
+        <button type="submit" class="mui-btn mui-btn-primary">确认</button>
         <button type="button" class="mui-btn mui-btn-danger" onclick="history.go(-1)">返回</button>
     </div>
 </form>
 <script src="/assets/libs/fastadmin-citypicker/dist/js/city-picker.data.min.js"></script>
 <script src="/assets/libs/fastadmin-citypicker/dist/js/city-picker.min.js"></script>
+<script>
+    $("#region").on("cp:updated", function () {
+        const cityPicker = $(this).data("citypicker");
+        const code = cityPicker.getCode("district") || cityPicker.getCode("city") || cityPicker.getCode("province");
+        $('#code').val(code);
+    })
+
+    $('#avatar').change(function () {
+        const file = $(this)[0].files[0]
+        if (file) {
+            let reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onload = () => {
+                $('.avatar img').attr('src', reader.result)
+            }
+        }
+    })
+</script>
