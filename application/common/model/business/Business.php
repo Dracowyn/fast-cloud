@@ -24,7 +24,8 @@ class Business extends Model
 
 	// 追加数据表的不存在字段
 	protected $append = [
-		'mobile_text'
+		'mobile_text',
+		'avatar_cdn'
 	];
 
 	/**
@@ -36,5 +37,22 @@ class Business extends Model
 	{
 		$mobile = $data['mobile'] ?? '';
 		return substr_replace($mobile, '****', 3, 4);
+	}
+
+
+	/**
+	 * @param $value
+	 * @param array $data 当前整行数据
+	 * @return string 返回头像的完整路径
+
+	 */
+	public function getAvatarCdnAttr($value, array $data)
+	{
+		$avatar = $data['avatar'] ?? '';
+		if (!is_file('.' . $avatar)) {
+			$avatar = '/assets/img/avatar.png';
+		}
+		$cdn = config('site.url');
+		return $cdn . $avatar;
 	}
 }

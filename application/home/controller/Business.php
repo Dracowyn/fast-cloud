@@ -3,6 +3,8 @@
 namespace app\home\controller;
 
 use app\common\controller\Home;
+use app\common\library\Email;
+use think\exception\PDOException;
 
 class Business extends Home
 {
@@ -102,5 +104,122 @@ class Business extends Home
 		}
 
 		return $this->fetch();
+	}
+
+	public function email()
+	{
+		if ($this->request->isPost()) {
+			$code = $this->request->param('code', '', 'trim');
+
+			if (empty($code)) {
+				$this->error('验证码不能为空');
+			}
+
+			$email = empty($this->auth->email) ? '' : $this->auth->email;
+
+			if (empty($email)) {
+				$this->error('邮箱不能为空');
+			}
+
+			$emailModel = model('Ems');
+
+			$emailInfo = $emailModel->where(['code' => $code, 'email' => $email])->find();
+
+			if (!$emailInfo) {
+				$this->error('验证码错误，请重新输入');
+			}
+
+			// 开启事务
+			$this->BusinessModel->startTrans();
+			$emailModel->startTrans();
+
+			$BusinessData = [
+				'id' => $this->auth->id,
+				'auth' => 1
+			];
+
+			$BusinessStatus = $this->BusinessModel->isUpdate()->save($BusinessData);
+
+			if ($BusinessStatus === false) {
+				$this->error('认证失败');
+			}
+
+			$emailStatus = $emailModel->destroy($emailInfo['id']);
+
+			if ($BusinessStatus && $emailStatus) {
+				$this->BusinessModel->commit();
+				$emailModel->commit();
+				$this->success('认证成功', url('home/business/index'));
+			} else {
+				$this->BusinessModel->rollback();
+				$emailModel->rollback();
+				$this->error('认证失败');
+			}
+		}
+
+		return $this->fetch();
+	}
+
+	// 发送验证码
+	public function send()
+	{
+		if ($this->request->isAjax()) {
+			$email = empty($this->auth->email) ? '' : $this->auth->email;
+			if (!$email) {
+				$this->error('邮箱不能为空');
+			}
+
+			// 组装条件数组
+			$condition = [
+				'email' => $email,
+				'event' => 'email',
+				'times' => 0
+			];
+
+			$emailModel = model('Ems');
+
+// 查询是否已经发送过验证码
+			$emailInfo = $emailModel->where($condition)->find();
+
+			if ($emailInfo) {
+				$this->error('验证码已发送，请查看邮箱');
+			}
+
+			// 开启事务
+			$emailModel->startTrans();
+			$code = build_randstr(4);
+			$data = [
+				'email' => $email,
+				'code' => $code,
+				'event' => 'email',
+				'times' => time()
+			];
+
+			$emailStatus = $emailModel->validate('common/Ems')->save($data);
+
+			if ($emailStatus === false) {
+				$this->error($emailModel->getError());
+			}
+
+			// 实例化
+			$mail = new Email();
+
+			// 正文内容
+			$content = '您的验证码是：' . $code . '，请不要把验证码泄露给其他人。如非本人操作，可不用理会！';
+
+			// 发件人
+			$emailFrom = config('site.mail_from');
+
+			$result = $mail->from($emailFrom)->subject('云课堂认证')->message($content)->to($email)->send();
+
+
+			if ($result === true) {
+				$emailModel->commit();
+				$this->success('发送成功');
+			} else {
+				$emailModel->rollback();
+				$this->error('发送失败');
+			}
+		}
 	}
 }

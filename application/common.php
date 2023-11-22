@@ -584,11 +584,7 @@ if (!function_exists('build_randstr')) {
 
 		$chars = implode('', $chars);
 		$chars = str_shuffle($chars);
-		$str = substr($chars, 0, $length);
-		for ($i = 0; $i < $length; $i++) {
-			$str .= $chars[mt_rand(0, strlen($chars) - 1)];
-		}
-		return str_shuffle($str);
+		return substr($chars, 0, $length);
 	}
 }
 

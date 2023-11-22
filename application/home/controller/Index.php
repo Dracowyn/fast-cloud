@@ -121,7 +121,7 @@ class Index extends Controller
 			if ($result === false) {
 				$this->error($this->BusinessModel->getError());
 			} else {
-				$this->success('注册成功', url('home/index/register'));
+				$this->success('注册成功', url('home/index/login'));
 			}
 		}
 
