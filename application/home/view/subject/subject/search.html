@@ -24,7 +24,7 @@
     let search = '';
 
     // 事件
-    $('input[name="search"]').keydown(function (e) {
+    $('#search').keydown(function (e) {
         // 回车键
         if (e.keyCode == 13 || e.keyCode == 108) {
             search = $.trim($(this).val());
@@ -103,7 +103,7 @@
                     <div class="info">
                         <h5 class="title">${item.title}</h5>
                         <p class="content mui-ellipsis">课程分类：${item.category.name}</p>
-                        <p class="content mui-ellipsis">创建时间：${item.createtime_text}</p>
+                        <p class="content mui-ellipsis">创建时间：${item.create_time_text}</p>
                         <p class="content mui-ellipsis">${item.content}</p>
                         <p class="bottom">
                             <span class="like mui-icon mui-icon-starhalf">
