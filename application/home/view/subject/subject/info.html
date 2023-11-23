@@ -5,7 +5,7 @@
     <img class="cover_bg" src="{$subject.thumbs_cdn}">
     <!-- 中间播放键 -->
     <div id="play">
-        <img src="/assets/images/play.png" />
+        <img src="/assets/images/play.png"/>
     </div>
 </div>
 
@@ -20,7 +20,9 @@
             <!-- 点赞 -->
             <!-- <img class="thumbs" src="./assets/images/thumbs-up.png" alt=""> -->
             <!-- 未点赞 -->
-            <img class="thumbs" src="/assets/images/thumbs.png" alt="">
+            <img class="thumbs"
+                 src="{$subject['like_status'] ? '/assets/images/thumbs-up.png' : '/assets/images/thumbs.png'}"
+                 alt="">
             <span class="num">{$subject.like_count}</span>
         </div>
     </div>
@@ -130,3 +132,28 @@
 
 <!-- 加载ckplayer视频插件 -->
 <script src="/assets/plugin/ckplayer/ckplayer.min.js"></script>
+
+<script>
+    $('.action').click(function () {
+        $.ajax({
+            type: 'post',
+            url: `{:url('/home/subject/subject/like')}`,
+            data: {
+                subid: `{$subject.id}`
+            },
+            dataType: 'json',
+            success: function (res) {
+                if (res.code === 1) {
+                    if (res.msg.includes('取消点赞成功')) {
+                        $('.num').text(parseInt($('.num').text()) - 1);
+                        $('.thumbs').attr('src', '/assets/images/thumbs.png');
+                    } else {
+                        $('.num').text(parseInt($('.num').text()) + 1);
+                        $('.thumbs').attr('src', '/assets/images/thumbs-up.png');
+                    }
+                }
+                mui.toast(res.msg);
+            }
+        })
+    });
+</script>
