@@ -3,6 +3,7 @@
 
 <!-- 搜索框 -->
 <div class="mui-input-row mui-search">
+    <label for="search" style="display: none"></label>
     <input type="search" class="mui-input-clear" placeholder="请输入课程名称" name="search" id="search"/>
 </div>
 
@@ -26,10 +27,9 @@
     // 事件
     $('#search').keydown(function (e) {
         // 回车键
-        if (e.keyCode == 13 || e.keyCode == 108) {
+        if (e.keyCode === 13 || e.keyCode === 108) {
             search = $.trim($(this).val());
             downCallback();
-            return;
         }
     });
 
@@ -57,7 +57,6 @@
     function downCallback() {
         scroll.resetUpScroll();
         $('#subject ul').empty();
-        return;
     }
 
     // 上拉加载
@@ -98,7 +97,7 @@
             <li class="mui-table-view-cell mui-media">
                 <a class="item" href="{:url('/home/subject/subject/info')}?subid=${item.id}">
                     <div class="thumb">
-                        <img class="img" src="${item.thumbs_cdn}">
+                        <img class="img" src="${item.thumbs_cdn}" alt="封面">
                     </div>
                     <div class="info">
                         <h5 class="title">${item.title}</h5>
