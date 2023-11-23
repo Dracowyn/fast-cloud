@@ -13,18 +13,25 @@ class Index extends Controller
 {
 	protected $BusinessModel = null;
 
+	protected $SubjectModel = null;
+
 	public function _initialize()
 	{
 		$this->BusinessModel = model('business.Business');
+		$this->SubjectModel = model('subject.Subject');
 	}
 
 	public function index(): string
 	{
-		try {
-			return $this->view->fetch();
-		} catch (Exception $e) {
-			return $e->getMessage();
-		}
+		$hotList = $this->SubjectModel->order('create_time DESC')->limit(6)->select();
+
+		$SubjectList = $this->SubjectModel->orderRaw('LPAD(LOWER(likes),10,0) DESC')->limit(8)->select();
+
+		$this->assign([
+			'hotList' => $hotList,
+			'SubjectList' => $SubjectList,
+		]);
+		return $this->view->fetch();
 	}
 
 	public function login()
