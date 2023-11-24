@@ -176,7 +176,21 @@ class Subject extends Home
 				$this->error('请先购买课程', null, ['buy' => true]);
 			}
 
-			// TODO: 判断是否购买课程
+			$where = [
+				'subid' => $subId,
+			];
+
+			if ($cid) {
+				$where['id'] = $cid;
+			}
+
+			$chapter = $this->ChapterModel->where($where)->order('id asc')->limit(1)->find();
+
+			if ($chapter) {
+				$this->success('Success', null, $chapter);
+			} else {
+				$this->error('暂无章节');
+			}
 		}
 	}
 

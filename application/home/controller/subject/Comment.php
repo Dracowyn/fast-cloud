@@ -12,7 +12,7 @@ use app\common\controller\Home;
 
 class Comment extends Home
 {
-	protected $noNeedLogin = ['search', 'info'];
+	protected $noNeedLogin = ['index'];
 
 	// 评论模型
 	protected $CommentModel = null;

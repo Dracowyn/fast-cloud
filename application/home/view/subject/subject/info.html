@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="/assets/css/details.css">
-
+<link rel="stylesheet" href="/assets/plugin/ckplayer/css/ckplayer.css">
 <div id="cover">
     <!-- 课程封面 -->
     <img class="cover_bg" src="{$subject.thumbs_cdn}">
@@ -114,9 +114,11 @@
 </div>
 
 <!-- 加载ckplayer视频插件 -->
-<script src="/assets/plugin/ckplayer/ckplayer.min.js"></script>
+
+<script src="/assets/plugin/ckplayer/js/ckplayer.min.js"></script>
 
 <script>
+    let player;
     $('.action').click(function () {
         $.ajax({
             type: 'post',
@@ -143,7 +145,14 @@
     let subId = `{$subject.id}`, cid;
 
     function toggle(id) {
-        cid = id;
+        cid = id
+        if (player) {
+            player.pause()
+            player.remove()
+        }
+
+        $('#cover').css('display','block')
+        $('#video').css('display','none')
     }
 
     // 购买
@@ -165,7 +174,7 @@
                             mui.toast(res.msg);
                             setTimeout(function () {
                                 window.location.reload();
-                            }, 2000);
+                            }, 1000);
                         } else {
                             mui.toast(res.msg);
                         }
@@ -187,9 +196,35 @@
             dataType: 'json',
             success: function (res) {
                 if (res.code === 0) {
-                    mui('#sheet1').popover('toggle');
-                } else {
+                    if (res.data.buy) {
+                        mui('#sheet1').popover('toggle');
+                    }
                     mui.toast(res.msg);
+                } else {
+                    let url = res.data.url ? res.data.url :'';
+                    if (url) {
+                        $('#cover').css('display','none')
+                        $('#video').css('display','block')
+                        player = new ckplayer({
+                            container: '#video',// 视频容器的ID
+                            volume: 1,// 默认音量，范围0-1
+                            video: url,// 视频地址
+                            playbackrate: 1,// 默认倍速
+                            autoplay: true,// 是否自动播放
+                            loop: false,// 是否需要循环播放
+                            information:{
+                                // 关于
+                                'Load:':'{loadTime} second',
+                                'Duration:':'{duration} second',
+                                'Size:':'{videoWidth}x{videoHeight}',
+                                'Volume:':'{volume}%',
+                                'Sudio decoded:':'{audioDecodedByteCount} Byte',
+                                'Video decoded:':'{videoDecodedByteCount} Byte'
+                            },
+                        });
+                    } else {
+                        mui.toast('暂无视频');
+                    }
                 }
             }
         })
