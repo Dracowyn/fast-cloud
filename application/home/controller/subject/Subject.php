@@ -16,11 +16,13 @@ class Subject extends Home
 
 	// 课程模型
 	protected $SubjectModel = null;
+	protected $CommentModel = null;
 
 	public function __construct()
 	{
 		parent::__construct();
 		$this->SubjectModel = model('subject.Subject');
+		$this->CommentModel = model('subject.Comment');
 	}
 
 	// 搜索课程
@@ -74,13 +76,15 @@ class Subject extends Home
 			$subject['like_status'] = false;
 			$business = model('business.Business')->where(['id' => $busId, 'mobile' => $mobile])->find();
 
+			$commentList = $this->CommentModel->with(['business'])->where(['subid' => $subId])->order('id asc')->limit(5)->select();
 			if ($business) {
 				$likeStr = explode(',', $subject['likes']);
 				$likeStr = array_filter($likeStr);
 				$subject['like_status'] = in_array($business['id'], $likeStr);
 			}
 			$this->assign([
-				'subject' => $subject
+				'subject' => $subject,
+				'commentList' => $commentList
 			]);
 			return $this->fetch();
 		} else {

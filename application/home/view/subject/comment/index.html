@@ -1,0 +1,112 @@
+<link rel="stylesheet" href="/assets/plugin/mescroll/mescroll.min.css"/>
+<link rel="stylesheet" href="/assets/css/details.css">
+
+<header class="mui-bar mui-bar-nav mui-bar-nav-bg">
+    <a id="icon-menu" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">评价列表</h1>
+</header>
+
+<div id="commentList" class="mui-content mescroll">
+    <ul class="mui-table-view">
+    </ul>
+</div>
+
+<!-- 引入底部 -->
+{include file='common/footer'/}
+<script src="/assets/plugin/mescroll/mescroll.min.js"></script>
+
+<script>
+    // 课程id
+    const subid = `{$Request.param.subid}`
+
+    // 评论列表
+    let commentList = [];
+
+    // 评论分页
+    let page = 1;
+
+    // 评论总数
+    let total = 0;
+
+    // 评论分页
+    let scroll = new MeScroll('commentList', {
+        down: {
+            auto: false,//是否在初始化完毕之后自动执行下拉回调callback; 默认true
+            callback: downCallback // 下拉刷新的回调,别写成downCallback(),多了括号就自动执行方法了
+        },
+        // 上拉加载
+        up: {
+            auto: true, //是否在初始化时以上拉加载的方式自动加载第一页数据; 默认false
+            isBounce: false, //此处禁止ios回弹,解析(务必认真阅读,特别是最后一点): http://www.mescroll.com/qa.html#q10
+            callback: UpCallback, //上拉回调,此处可简写; 相当于 callback: function (page) { upCallback(page); }
+            toTop: { //配置回到顶部按钮
+                duration: 600,
+                src: "/assets/images/mescroll-totop.png", //默认滚动到1000px显示,可配置offset修改
+                offset: 100
+            },
+            // 已经到底提示
+            htmlNodata: '<div class="more">没有更多了..</div>',
+        }
+    });
+
+    // 下拉刷新
+    function downCallback() {
+        scroll.resetUpScroll();
+        $('#commentList ul').empty();
+    }
+
+    // 上拉加载
+    function UpCallback() {
+        getCommentList();
+    }
+
+    // 获取评论列表
+    function getCommentList() {
+        $.ajax({
+            url: `{:url('/home/subject/comment/index')}`,
+            type: 'post',
+            dataType: 'json',
+            data: {
+                subid,
+                page
+            },
+            success: function (res) {
+                if (res.code === 0) {
+                    mui.toast(res.msg);
+                    // 隐藏下拉刷新和上拉加载的状态
+                    scroll.endBySize(0, 0)
+                    return;
+                }
+
+                const list = res.data.list;
+                const count = res.data.count;
+
+                scroll.endBySize(list.length, count);
+                fetchList(list);
+            }
+        })
+    }
+
+    // 数据渲染
+    function fetchList(list) {
+        let str = '';
+        for(const item of list)
+        {
+            str += `
+            <li class="mui-table-view-cell mui-media">
+                <a href="javascript:;">
+                    <img class="mui-media-object mui-pull-left userimg" src="${item.business.avatar_cdn}">
+                    <div class="mui-media-body">
+                        ${item.business.nickname}
+                        <p class='mui-ellipsis'>${item.content}</p>
+                    </div>
+                </a>
+            </li>
+            `;
+        }
+
+        $("#commentList ul").append(str);
+    }
+
+
+</script>

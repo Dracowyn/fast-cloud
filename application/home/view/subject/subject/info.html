@@ -61,55 +61,28 @@
 
 <!-- 评论内容 -->
 <ul class="mui-table-view">
+    {if condition="count($commentList) > 0"}
+    {foreach($commentList as $item)}
     <li class="mui-table-view-cell mui-media">
-        <a href="javascript:;">
-            <img class="mui-media-object mui-pull-left userimg" src="/assets/images/rose.jpg">
+        <a href="javascript:">
+            <img class="mui-media-object mui-pull-left userimg" src="{$item.business.avatar_cdn}">
             <div class="mui-media-body">
-                Rose
-                <p class='mui-ellipsis'>这个视频真的特别棒！！！</p>
+                {$item.business.nickname}
+                <p class='mui-ellipsis'>{$item.content}</p>
             </div>
         </a>
     </li>
+    {/foreach}
+    {else /}
     <li class="mui-table-view-cell mui-media">
-        <a href="javascript:;">
-            <img class="mui-media-object mui-pull-left userimg" src="/assets/images/rose.jpg">
-            <div class="mui-media-body">
-                Rose
-                <p class='mui-ellipsis'>这个视频真的特别棒！！！</p>
-            </div>
-        </a>
+        暂无评价
     </li>
-    <li class="mui-table-view-cell mui-media">
-        <a href="javascript:;">
-            <img class="mui-media-object mui-pull-left userimg" src="/assets/images/rose.jpg">
-            <div class="mui-media-body">
-                Rose
-                <p class='mui-ellipsis'>这个视频真的特别棒！！！</p>
-            </div>
-        </a>
-    </li>
-    <li class="mui-table-view-cell mui-media">
-        <a href="javascript:;">
-            <img class="mui-media-object mui-pull-left userimg" src="/assets/images/rose.jpg">
-            <div class="mui-media-body">
-                Rose
-                <p class='mui-ellipsis'>这个视频真的特别棒！！！</p>
-            </div>
-        </a>
-    </li>
-    <li class="mui-table-view-cell mui-media">
-        <a href="javascript:;">
-            <img class="mui-media-object mui-pull-left userimg" src="/assets/images/rose.jpg">
-            <div class="mui-media-body">
-                Rose
-                <p class='mui-ellipsis'>这个视频真的特别棒！！！</p>
-            </div>
-        </a>
-    </li>
+    {/if}
 </ul>
 
+
 <div class="more">
-    <a href="comment_list.html" class="mui-btn mui-btn-primary mui-btn-outlined">查看更多评论</a>
+    <a href="{:url('/home/subject/comment')}?subid={$Request.param.subid}" class="mui-btn mui-btn-primary mui-btn-outlined">查看更多评论</a>
 </div>
 
 <!-- 弹出菜单 -->
