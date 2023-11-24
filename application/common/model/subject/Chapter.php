@@ -12,4 +12,10 @@ class Chapter extends Model
 {
 	// 指向数据表
 	protected $name = 'subject_chapter';
+
+	// 开启自动写入时间戳字段
+	protected $autoWriteTimestamp = true;
+
+	// 定义创建时间的字段名
+	protected $createTime = 'create_time';
 }

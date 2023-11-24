@@ -16,13 +16,23 @@ class Subject extends Home
 
 	// 课程模型
 	protected $SubjectModel = null;
+
+	// 评论模型
 	protected $CommentModel = null;
+
+	// 章节模型
+	protected $ChapterModel = null;
+
+	// 订单模型
+	protected $OrderModel = null;
 
 	public function __construct()
 	{
 		parent::__construct();
 		$this->SubjectModel = model('subject.Subject');
 		$this->CommentModel = model('subject.Comment');
+		$this->ChapterModel = model('subject.Chapter');
+		$this->OrderModel = model('business.Order');
 	}
 
 	// 搜索课程
@@ -77,6 +87,8 @@ class Subject extends Home
 			$business = model('business.Business')->where(['id' => $busId, 'mobile' => $mobile])->find();
 
 			$commentList = $this->CommentModel->with(['business'])->where(['subid' => $subId])->order('id asc')->limit(5)->select();
+			$chapterList = $this->ChapterModel->where(['subid' => $subId])->limit(5)->order('create_time DESC')->select();
+
 			if ($business) {
 				$likeStr = explode(',', $subject['likes']);
 				$likeStr = array_filter($likeStr);
@@ -84,7 +96,8 @@ class Subject extends Home
 			}
 			$this->assign([
 				'subject' => $subject,
-				'commentList' => $commentList
+				'commentList' => $commentList,
+				'chapterList' => $chapterList,
 			]);
 			return $this->fetch();
 		} else {
@@ -135,6 +148,147 @@ class Subject extends Home
 				$this->success($msg . '成功');
 			} else {
 				$this->error($msg . '失败');
+			}
+		}
+	}
+
+	// 播放视频
+	public function play()
+	{
+		if ($this->request->isAjax()) {
+			$subId = $this->request->param('subid', 0, 'trim');
+			$cid = $this->request->param('cid', 0, 'trim');
+
+			$subject = $this->SubjectModel->find($subId);
+
+			if (!$subject) {
+				$this->error('课程不存在');
+			}
+
+			$orderWhere = [
+				'subid' => $subId,
+				'busid' => $this->auth->id,
+			];
+
+			$order = $this->OrderModel->where($orderWhere)->find();
+
+			if (!$order) {
+				$this->error('请先购买课程', null, ['buy' => true]);
+			}
+
+			// TODO: 判断是否购买课程
+		}
+	}
+
+	// 购买课程
+	public function buy()
+	{
+		if ($this->request->isAjax()) {
+			$subId = $this->request->param('subid', 0, 'trim');
+
+			$subject = $this->SubjectModel->find($subId);
+
+			if (!$subject) {
+				$this->error('课程不存在');
+			}
+
+			$orderWhere = [
+				'subid' => $subId,
+				'busid' => $this->auth->id,
+			];
+
+			$order = $this->OrderModel->where($orderWhere)->find();
+
+			if ($order) {
+				$this->error('您已购买该课程');
+			}
+
+
+			// 判断用户余额是否充足
+			$updatePrice = bcsub($this->auth->money, $subject['price'], 2);
+
+			if ($updatePrice < 0) {
+				$this->error('余额不足，请充值');
+			}
+
+			// 加载模型
+			$businessModel = model('business.Business');
+			$recordModel = model('business.Record');
+
+			// 开启事务
+			$this->OrderModel->startTrans();
+			$businessModel->startTrans();
+			$recordModel->startTrans();
+
+			// 订单数据
+			$orderData = [
+				'subid' => $subId,
+				'busid' => $this->auth->id,
+				'total' => $subject['price'],
+				'code' => build_order('SUB'),
+			];
+
+			$orderStatus = $this->OrderModel->validate('Order')->save($orderData);
+
+			if (!$orderStatus) {
+				$this->error($this->OrderModel->getError());
+			}
+
+			// 更新用户余额
+			$businessData = [
+				'id' => $this->auth->id,
+				'money' => $updatePrice
+			];
+
+			if ($this->auth->deal != 1) {
+				$businessData['deal'] = 1;
+			}
+
+			// 自定义验证器
+			$validate = [                // 规则
+				[
+					'money' => ['number', '>=:0'],
+				],
+				// 错误信息
+				[
+					'money.number' => '余额必须是数字类型',
+					'money.>=' => '余额必须大于等于0元',
+				]
+			];
+
+			$businessStatus = $businessModel->validate(...$validate)->isUpdate()->save($businessData);
+
+			if (!$businessStatus) {
+				$this->OrderModel->rollback();
+				$this->error($businessModel->getError());
+			}
+
+			// 消费记录
+			$recordData = [
+				'total' => $subject['price'],
+				'content' => '购买课程【{$subject["title"}】花费了￥{$subject["price"]}元',
+				'busid' => $this->auth->id,
+			];
+
+			$recordStatus = $recordModel->validate('Record')->save($recordData);
+
+			if (!$recordStatus) {
+				$this->OrderModel->rollback();
+				$businessModel->rollback();
+				$this->error($recordModel->getError());
+			}
+
+			// 判断
+			if ($orderStatus && $businessStatus && $recordStatus) {
+				$this->OrderModel->commit();
+				$businessModel->commit();
+				$recordModel->commit();
+				$this->success('购买成功');
+			} else {
+				$this->OrderModel->rollback();
+				$businessModel->rollback();
+				$recordModel->rollback();
+				$this->error('购买失败');
 			}
 		}
 	}

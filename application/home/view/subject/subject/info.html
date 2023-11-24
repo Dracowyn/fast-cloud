@@ -53,8 +53,13 @@
 
 <div class="title">课程章节</div>
 <ul class="mui-table-view">
-    <li class="mui-table-view-cell">章节内容</li>
+    {if condition="count($chapterList) > 0"}
+    {foreach $chapterList as $key => $item}
+    <li class="mui-table-view-cell" onclick="toggle(`{$item.id}`)">{$key + 1}、{$item.title}</li>
+    {/foreach}
+    {else /}
     <li class="mui-table-view-cell">暂无课程章节</li>
+    {/if}
 </ul>
 
 <div class="title">用户评论</div>
@@ -82,7 +87,12 @@
 
 
 <div class="more">
-    <a href="{:url('/home/subject/comment')}?subid={$Request.param.subid}" class="mui-btn mui-btn-primary mui-btn-outlined">查看更多评论</a>
+    {if condition="count($commentList) > 0"}
+    <a href="{:url('/home/subject/comment/index',['subid' => $subject.id])}"
+       class="mui-btn mui-btn-primary mui-btn-outlined">查看更多评论</a>
+    {else /}
+    <a href="javascript:" class="mui-btn mui-btn-primary mui-btn-outlined">暂无更多评论</a>
+    {/if}
 </div>
 
 <!-- 弹出菜单 -->
@@ -129,4 +139,60 @@
             }
         })
     });
+
+    let subId = `{$subject.id}`, cid;
+
+    function toggle(id) {
+        cid = id;
+    }
+
+    // 购买
+    $('#buy').click(function () {
+        mui('#sheet1').popover('toggle');
+
+        const btnArray = ['取消', '确定'];
+        mui.confirm('确认购买该课程？', '购买提示', btnArray, function (e) {
+            if (e.index === 1) {
+                $.ajax({
+                    type: 'post',
+                    url: `{:url('/home/subject/subject/buy')}`,
+                    data: {
+                        subid: subId
+                    },
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.code === 1) {
+                            mui.toast(res.msg);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 2000);
+                        } else {
+                            mui.toast(res.msg);
+                        }
+                    }
+                })
+            }
+        })
+    });
+
+    // 播放
+    $('#play').click(function () {
+        $.ajax({
+            type: 'post',
+            url: `{:url('/home/subject/subject/play')}`,
+            data: {
+                subid: subId,
+                cid
+            },
+            dataType: 'json',
+            success: function (res) {
+                if (res.code === 0) {
+                    mui('#sheet1').popover('toggle');
+                } else {
+                    mui.toast(res.msg);
+                }
+            }
+        })
+    });
+
 </script>
