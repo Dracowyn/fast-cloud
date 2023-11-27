@@ -73,16 +73,14 @@
             success: function (res) {
                 if (res.code === 0) {
                     mui.toast(res.msg);
-                    // 隐藏下拉刷新和上拉加载的状态
                     scroll.endBySize(0, 0)
-                    return;
+                } else {
+                    const list = res.data.list;
+                    const count = res.data.count;
+                    fetchList(list);
+                    page++;
+                    scroll.endBySize(list.length, count);
                 }
-
-                const list = res.data.list;
-                const count = res.data.count;
-
-                scroll.endBySize(list.length, count);
-                fetchList(list);
             }
         })
     }

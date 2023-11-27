@@ -242,7 +242,7 @@ class Subject extends Home
 				'code' => build_order('SUB'),
 			];
 
-			$orderStatus = $this->OrderModel->validate('Order')->save($orderData);
+			$orderStatus = $this->OrderModel->validate('common/subject/Order')->save($orderData);
 
 			if (!$orderStatus) {
 				$this->error($this->OrderModel->getError());
@@ -280,7 +280,7 @@ class Subject extends Home
 			// 消费记录
 			$recordData = [
 				'total' => $subject['price'],
-				'content' => '购买课程【{$subject["title"}】花费了￥{$subject["price"]}元',
+				'content' => "购买【{$subject['title']}】花费￥{$subject['price']}元",
 				'busid' => $this->auth->id,
 			];
 

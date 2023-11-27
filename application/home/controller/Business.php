@@ -10,10 +10,18 @@ class Business extends Home
 {
 	protected $BusinessModel = null;
 
+	// 订单记录模型
+	protected $OrderModel = null;
+
+	// 消费记录模型
+	protected $RecordModel = null;
+
 	public function __construct()
 	{
 		parent::__construct();
 		$this->BusinessModel = model('business.Business');
+		$this->OrderModel = model('business.Order');
+		$this->RecordModel = model('business.Record');
 	}
 
 	public function index()
@@ -221,5 +229,55 @@ class Business extends Home
 				$this->error('发送失败');
 			}
 		}
+	}
+
+	// 我的订单
+	public function order()
+	{
+		if ($this->request->isAjax()) {
+			// 接收参数
+			$page = $this->request->param('page', 1, 'trim');
+			$limit = $this->request->param('limit', 10, 'trim');
+			$count = $this->OrderModel->where(['busid' => $this->auth->id])->count();
+
+			$orderList = $this->OrderModel->with(['subject'])->where(['busid' => $this->auth->id])->page($page, $limit)->select();
+
+			$data = [
+				'count' => $count,
+				'list' => $orderList
+			];
+
+			if ($orderList) {
+				$this->success('Success', null, $data);
+			} else {
+				$this->error('暂无数据');
+			}
+		}
+		return $this->fetch();
+	}
+
+	// 我的消费记录
+	public function record()
+	{
+		if ($this->request->isAjax()) {
+			// 接收参数
+			$page = $this->request->param('page', 1, 'trim');
+			$limit = $this->request->param('limit', 10, 'trim');
+			$count = $this->RecordModel->where(['busid' => $this->auth->id])->count();
+
+			$recordList = $this->RecordModel->where(['busid' => $this->auth->id])->page($page, $limit)->select();
+
+			$data = [
+				'count' => $count,
+				'list' => $recordList
+			];
+
+			if ($recordList) {
+				$this->success('Success', null, $data);
+			} else {
+				$this->error('暂无数据');
+			}
+		}
+		return $this->fetch();
 	}
 }

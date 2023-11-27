@@ -17,10 +17,14 @@ class Comment extends Home
 	// 评论模型
 	protected $CommentModel = null;
 
+	// 订单模型
+	protected $OrderModel = null;
+
 	public function __construct()
 	{
 		parent::__construct();
 		$this->CommentModel = model('subject.Comment');
+		$this->OrderModel = model('business.Order');
 	}
 
 	public function index()
@@ -46,6 +50,51 @@ class Comment extends Home
 			}
 		}
 
+		return $this->fetch();
+	}
+
+	// 增加评论
+	public function add()
+	{
+		$orderId = $this->request->param('orderid', 0, 'trim');
+		$order = $this->OrderModel->where(['id' => $orderId])->find();
+
+		if (!$order) {
+			$this->error('订单不存在');
+		}
+
+		// 判断是否已经评论过
+		$isComment = [
+			'busid' => $this->auth->id,
+			'subid' => $order['subid']
+		];
+		$comment = $this->CommentModel->where($isComment)->find();
+
+		$this->assign([
+			'order' => $order,
+			'comment' => $comment
+		]);
+
+
+		if ($comment) {
+			$this->error('您已经评论过了');
+		}
+
+		if ($this->request->isPost()) {
+			// 接收参数
+			$content = $this->request->param('content', '', 'trim');
+			$data = [
+				'busid' => $this->auth->id,
+				'subid' => $order['subid'],
+				'content' => $content
+			];
+			$result = $this->CommentModel->validate('common/subject/Comment')->save($data);
+			if ($result) {
+				$this->success('评论成功', url('home/business/index'));
+			} else {
+				$this->error('评论失败');
+			}
+		}
 		return $this->fetch();
 	}
 }

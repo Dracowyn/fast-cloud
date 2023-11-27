@@ -28,4 +28,37 @@ class Order extends Model
 
 	// 定义软删除字段
 	protected $deleteTime = 'delete_time';
+
+	// 追加不存在的字段
+	protected $append = [
+		'create_time_text',
+		'comment_status',
+	];
+
+	// 关联课程
+	public function subject()
+	{
+		return $this->belongsTo('app\common\model\subject\Subject', 'subid', 'id');
+	}
+
+	// 创建时间的获取器
+	public function getCreateTimeTextAttr($value, array $data)
+	{
+		$time = $data['create_time'] ?? '';
+		return datetime($time);
+	}
+
+	// 评论状态获取器
+	public function getCommentStatusAttr($value, array $data)
+	{
+		$subid = $data['subid'] ?? 0;
+		$busid = $data['busid'] ?? 0;
+
+		$status = false;
+		$comment = model('subject.Comment')->where(['subid' => $subid, 'busid' => $busid])->find();
+		if ($comment) {
+			$status = true;
+		}
+		return $status;
+	}
 }

@@ -5,7 +5,7 @@
  * @since 2023-11-24 14:28
  */
 
-namespace app\common\validate;
+namespace app\common\validate\subject;
 
 use think\Validate;
 

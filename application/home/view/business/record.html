@@ -1,0 +1,125 @@
+<!-- 下拉刷新 上拉加载的插件 -->
+<link rel="stylesheet" href="/assets/plugin/mescroll/mescroll.min.css" />
+
+<link href="/assets/css/order.css" rel="stylesheet" />
+
+<!-- 头部 -->
+<header class="mui-bar mui-bar-nav mui-bar-nav-bg">
+    <a id="icon-menu" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">我的消费</h1>
+</header>
+
+<div class="page__bd" style="height: 100%;margin-top: 44px">
+    <div class="weui-tab mescroll" id="orderList">
+        <div class="weui-tab__panel">
+        </div>
+    </div>
+</div>
+
+<!-- 下拉刷新 上拉加载的插件 -->
+<script src="/assets/plugin/mescroll/mescroll.min.js"></script>
+
+<script>
+    // 订单列表
+    let orderList = [];
+
+    // 订单分页
+    let page = 1;
+
+    // 订单总数
+    let total = 0;
+
+    // 订单分页
+    let scroll = new MeScroll('orderList', {
+        down: {
+            auto: false,//是否在初始化完毕之后自动执行下拉回调callback; 默认true
+            callback: downCallback // 下拉刷新的回调,别写成downCallback(),多了括号就自动执行方法了
+        },
+        // 上拉加载
+        up: {
+            auto: true, //是否在初始化时以上拉加载的方式自动加载第一页数据; 默认false
+            isBounce: false, //此处禁止ios回弹,解析(务必认真阅读,特别是最后一点): http://www.mescroll.com/qa.html#q10
+            callback: UpCallback, //上拉回调,此处可简写; 相当于 callback: function (page) { upCallback(page); }
+            toTop: { //配置回到顶部按钮
+                duration: 600,
+                src: "/assets/images/mescroll-totop.png", //默认滚动到1000px显示,可配置offset修改
+                offset: 100
+            },
+            // 已经到底提示
+            htmlNodata: '<div class="more">没有更多了..</div>',
+        }
+    });
+
+    // 下拉刷新
+    function downCallback() {
+        scroll.resetUpScroll();
+        // $('#orderList .weui-tab__panel').empty();
+    }
+
+    // 上拉加载
+    function UpCallback() {
+        getOrderList();
+    }
+
+    // 获取订单列表
+    function getOrderList() {
+        $.ajax({
+            url: `{:url('/home/business/record')}`,
+            type: 'post',
+            dataType: 'json',
+            data: {
+                page: page,
+                limit: 10,
+            },
+            success: function (res) {
+                if (res.code === 0) {
+                    mui.toast(res.msg)
+                    scroll.endBySize(0, 0);
+                } else {
+                    orderList = orderList.concat(res.data.list);
+                    total = res.data.count;
+                    renderOrderList(orderList);
+                    page++;
+                    scroll.endBySize(orderList.length, total);
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+
+        })
+    }
+
+    // 渲染订单列表
+    function renderOrderList(list) {
+        let str = ''
+        for (let item of list) {
+            str += `
+                <div class="weui-form-preview">
+                    <div class="weui-form-preview__hd">
+                        <div class="weui-form-preview__item">
+                            <label class="weui-form-preview__label">消费金额</label>
+                            <em class="weui-form-preview__value">￥${item.total}</em>
+                        </div>
+                    </div>
+                    <div class="weui-form-preview__bd">
+                        <div class="weui-form-preview__item">
+                            <label class="weui-form-preview__label">消费描述</label>
+                            <span class="weui-form-preview__value">${item.content}</span>
+                        </div>
+                        <div class="weui-form-preview__item">
+                            <label class="weui-form-preview__label">消费时间</label>
+                            <span class="weui-form-preview__value">${item.create_time_text}</span>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            `
+            $('#orderList .weui-tab__panel').html(str);
+        }
+
+        $('.mui-action-back').click(function () {
+            location.href = `{:url('/home/business/index')}`;
+        })
+    }
+</script>

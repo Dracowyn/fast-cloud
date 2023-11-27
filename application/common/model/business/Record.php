@@ -22,4 +22,15 @@ class Record extends Model
 
 	// 定义更新时间的字段名
 	protected $updateTime = 'update_time';
+
+	// 追加不存在的字段
+	protected $append = [
+		'create_time_text'
+	];
+
+	public function getCreateTimeTextAttr($value, array $data)
+	{
+		$time = $data['create_time'] ?? '';
+		return datetime($time);
+	}
 }
