@@ -41,6 +41,11 @@ class Order extends Model
 		return $this->belongsTo('app\common\model\subject\Subject', 'subid', 'id');
 	}
 
+	public function business()
+	{
+		return $this->belongsTo('app\common\model\business\Business', 'busid', 'id');
+	}
+
 	// 创建时间的获取器
 	public function getCreateTimeTextAttr($value, array $data)
 	{

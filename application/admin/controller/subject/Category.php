@@ -12,6 +12,7 @@ class Category extends Backend
 {
 	protected $model = null;
 
+	protected $relationSearch = true;
 	protected $searchFields = 'id,name,weight';
 
 	public function __construct()
