@@ -1,5 +1,5 @@
 define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefined, Backend, Table, Form) {
-    return {
+    const Controller = {
         index: function () {
             // 初始化表格参数配置
             Table.api.init({
@@ -62,7 +62,17 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
             Table.api.bindevent(table);
         },
         add: function () {
-            console.log('课程管理的add页面')
+            Controller.api.bindevent();
+        },
+        edit: function () {
+            Controller.api.bindevent();
+        },
+        api: {
+            bindevent: function () {
+                Form.api.bindevent($("form[role=form]"));
+            }
         }
     };
+
+    return Controller;
 });

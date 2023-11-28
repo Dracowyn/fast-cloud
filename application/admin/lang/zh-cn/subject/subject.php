@@ -11,4 +11,5 @@ return [
 	'Likes' => '点赞数',
 	'Price' => '课程价格',
 	'CateName' => '课程分类',
+	'Content' => '课程描述',
 ];
