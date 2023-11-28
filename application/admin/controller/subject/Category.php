@@ -1,34 +1,26 @@
 <?php
 /**
  * @author Dracowyn
- * @since 2023-11-28 14:21
+ * @since 2023-11-28 16:30
  */
 
 namespace app\admin\controller\subject;
 
 use app\common\controller\Backend;
 
-class Subject extends Backend
+class Category extends Backend
 {
 	protected $model = null;
 
-	protected $relationSearch = true;
-
-	protected $searchFields = 'id,title,price,category.name';
+	protected $searchFields = 'id,name,weight';
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->model = model('subject.Subject');
-
-		$cateList = model('subject.Category')->order('weight DESC')->column('id,name');
-
-		$this->assign([
-			'CateList' => $cateList
-		]);
+		$this->model = model('subject.Category');
 	}
 
-	// 课程列表
+	// 分类列表
 	public function index()
 	{
 		$this->request->filter(['strip_tags', 'trim']);
@@ -40,17 +32,16 @@ class Subject extends Backend
 
 			[$where, $sort, $order, $offset, $limit] = $this->buildparams();
 
-			$list = $this->model->with('category')->where($where)->order($sort, $order)->paginate($limit);
+			$list = $this->model->where($where)->order($sort, $order)->paginate($limit);
 
 			$result = ['total' => $list->total(), 'rows' => $list->items()];
 
 			return json($result);
 		}
-
 		return $this->fetch();
 	}
 
-	// 添加课程
+	// 添加分类
 	public function add()
 	{
 		if ($this->request->isPost()) {
@@ -60,29 +51,32 @@ class Subject extends Backend
 				$this->error(__('Parameter %s can not be empty', ''));
 			}
 
-			$result = $this->model->validate('common/subject/subject')->save($params);
+
+			// 添加数据
+			$result = $this->model->validate('common/subject/Category')->save($params);
 
 			if ($result) {
 				$this->success();
 			} else {
-				@is_file('.' . $params['thumbs']) && @unlink('.' . $params['thumbs']);
 				$this->error($this->model->getError());
 			}
 		}
-
 		return $this->fetch();
 	}
 
-	// 修改课程
+	// 编辑分类
 	public function edit($ids = null)
 	{
-		$ids = $ids ?: $this->request->param('ids', 0, 'trim');
-
+		$ids = $ids ?? $this->request->param('ids/a');
 		$row = $this->model->get($ids);
 
 		if (!$row) {
 			$this->error(__('No Results were found'));
 		}
+
+		$this->assign([
+			'row' => $row
+		]);
 
 		if ($this->request->isPost()) {
 			$params = $this->request->post('row/a');
@@ -91,43 +85,34 @@ class Subject extends Backend
 				$this->error(__('Parameter %s can not be empty', ''));
 			}
 
-			$result = $row->validate('common/subject/subject')->isUpdate()->save($params);
+			$params['id'] = $ids;
+
+			// 更新数据
+			$result = $this->model->validate('common/subject/Category')->isUpdate()->save($params);
 
 			if ($result) {
-				if ($row['thumbs'] != $params['thumbs']) {
-					@is_file('.' . $row['thumbs']) && @unlink('.' . $row['thumbs']);
-				}
 				$this->success();
 			} else {
-				if ($row['thumbs'] != $params['thumbs']) {
-					@is_file('.' . $params['thumbs']) && @unlink('.' . $params['thumbs']);
-				}
-				$this->error($row->getError());
+				$this->error($this->model->getError());
 			}
 		}
-
-		$this->assign([
-			'row' => $row
-		]);
-
 		return $this->fetch();
+
 	}
 
-	// 删除课程
+	// 删除分类
 	public function del($ids = null)
 	{
 		$ids = $ids ?: $this->request->param('ids', 0, 'trim');
-
 		$list = $this->model->all($ids);
 
-		if (!$list) {
-			$this->error(__('No Results were found'));
+		if (empty($list)) {
+			$this->error('课程分类不存在');
 		}
 
 		$result = $this->model->destroy($ids);
-
 		if ($result) {
-			$this->success('删除成功');
+			$this->success();
 		} else {
 			$this->error($this->model->getError());
 		}
