@@ -8,6 +8,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     add_url: 'subject/subject/add',
                     edit_url: 'subject/subject/edit',
                     del_url: 'subject/subject/del',
+                    chapter_url: 'subject/chapter/index',
                     table: 'subject'
                 }
             });
@@ -52,7 +53,17 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             title: __('Operate'),
                             table: table,
                             events: Table.api.events.operate,
-                            formatter: Table.api.formatter.operate
+                            formatter: Table.api.formatter.operate,
+                            buttons: [
+                                {
+                                    name: 'chapter',
+                                    title: '章节',
+                                    classname: 'btn btn-xs btn-primary btn-dialog',
+                                    icon: 'fa fa-list',
+                                    extend: 'data-toggle="tooltip" data-container="body"',
+                                    url: $.fn.bootstrapTable.defaults.extend.chapter_url
+                                }
+                            ]
                         }
                     ]
                 ]
