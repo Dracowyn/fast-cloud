@@ -10,5 +10,7 @@ return [
 	'SubjectThumbsCdn' => '课程封面图',
 	'SubjectPrice' => '课程价格',
 	'SubjectLikesCount' => '点赞数',
-	'SubjectCategoryName' => '课程分类'
+	'SubjectCategoryName' => '课程分类',
+	'BusId' => '用户ID',
+	'OrderTotal' => '消费金额',
 ];

@@ -122,7 +122,73 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 Table.api.bindevent(table);
             },
             order: function () {
-                console.log('订单');
+                // 初始化表格参数配置
+                Table.api.init({
+                    extend: {
+                        recyclebin_url: 'subject/order/recyclebin',
+                        del_url: 'subject/order/destroy',
+                        restore_url: 'subject/order/restore',
+                        table: 'order',
+                    }
+                });
+
+                // 获取表格的元素
+                const table = $('#table2');
+
+                // 初始化表格
+                table.bootstrapTable({
+                    url: $.fn.bootstrapTable.defaults.extend.recyclebin_url,
+                    pk: 'id',
+                    sortName: 'delete_time',
+                    toolbar: '#toolbar2',
+                    columns: [
+                        [
+                            {checkbox: true},
+                            {field: 'id', title: __('Id')},
+                            {field: 'code', title: __('Code')},
+                            {field: 'busid', title: __('BusId')},
+                            {field: 'business.nickname', title: __('Nickname')},
+                            {field: 'subject.title', title: __('SubjectTitle')},
+                            {field: 'total', title: __('OrderTotal')},
+                            {
+                                field: 'create_time',
+                                title: __('Deletetime'),
+                                operate: 'RANGE',
+                                addclass: 'datetimerange',
+                                formatter: Table.api.formatter.datetime
+                            },
+                            {
+                                field: 'operate',
+                                title: __('Operate'),
+                                table: table,
+                                events: Table.api.events.operate,
+                                formatter: Table.api.formatter.operate,
+                                buttons: [
+                                    {
+                                        name: 'restore',
+                                        title: '还原',
+                                        icon: 'fa fa-reply',
+                                        // 确认框
+                                        confirm: '确定要还原吗',
+                                        classname: 'btn btn-xs btn-success btn-ajax',
+                                        // 请求地址
+                                        url: $.fn.bootstrapTable.defaults.extend.restore_url,
+                                        extend: 'data-toggle="tooltip" data-container="body"',
+                                        // 请求成功回调函数
+                                        success: function (data, ret) {
+                                            $(".btn-refresh").trigger("click");
+                                        },
+                                        // 请求失败回调函数
+                                        error: function (err) {
+                                            console.log(err);
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    ],
+                });
+                Table.api.bindevent(table);
             }
         }
     };
