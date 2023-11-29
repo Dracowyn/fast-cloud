@@ -38,12 +38,12 @@ class Order extends Model
 	// 关联课程
 	public function subject()
 	{
-		return $this->belongsTo('app\common\model\subject\Subject', 'subid', 'id');
+		return $this->belongsTo('app\common\model\Subject\Subject', 'subid', 'id', [], 'LEFT')->setEagerlyType(0);
 	}
 
 	public function business()
 	{
-		return $this->belongsTo('app\common\model\business\Business', 'busid', 'id');
+		return $this->belongsTo('app\common\model\Business\Business', 'busid', 'id', [], 'LEFT')->setEagerlyType(0);
 	}
 
 	// 创建时间的获取器
