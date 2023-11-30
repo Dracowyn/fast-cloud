@@ -90,8 +90,10 @@ class Type extends Backend
 				$this->error($row->getError());
 			}
 		}
-
-		$this->view->assign("row", $row);
+		$data = [
+			'row' => $row
+		];
+		return $this->view->fetch('', $data);
 	}
 
 	/**
