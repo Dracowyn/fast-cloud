@@ -1,6 +1,6 @@
 define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefined, Backend, Table, Form) {
 
-    var Controller = {
+    const Controller = {
         index: function () {
             // 初始化表格参数配置
             Table.api.init({
@@ -15,7 +15,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 }
             });
 
-            var table = $("#table");
+            const table = $("#table");
 
             // 初始化表格
             table.bootstrapTable({
@@ -28,15 +28,45 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     [
                         {checkbox: true},
                         {field: 'id', title: __('Id')},
-                        {field: 'name', title: __('Name'), operate: 'LIKE', table: table, class: 'autocontent', formatter: Table.api.formatter.content},
-                        {field: 'flag', title: __('Flag'), searchList: {"1":__('Flag 1'),"2":__('Flag 2'),"3":__('Flag 3')}, formatter: Table.api.formatter.flag},
+                        {
+                            field: 'name',
+                            title: __('Name'),
+                            operate: 'LIKE',
+                            table: table,
+                            class: 'autocontent',
+                            formatter: Table.api.formatter.content
+                        },
+                        {
+                            field: 'flag',
+                            title: __('Flag'),
+                            searchList: {"1": __('新品'), "2": __('热销'), "3": __('推荐')},
+                            formatter: Table.api.formatter.flag
+                        },
                         {field: 'stock', title: __('Stock')},
-                        {field: 'typeid', title: __('Typeid')},
-                        {field: 'unitid', title: __('Unitid')},
-                        {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', autocomplete:false, formatter: Table.api.formatter.datetime},
-                        {field: 'price', title: __('Price'), operate:'BETWEEN'},
-                        {field: 'status', title: __('Status'), searchList: {"0":__('Status 0'),"1":__('Status 1')}, formatter: Table.api.formatter.status},
-                        {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
+                        {field: 'type.name', title: __('TypeName')},
+                        {field: 'unit.name', title: __('UnitName')},
+                        {
+                            field: 'create_time',
+                            title: __('Createtime'),
+                            operate: 'RANGE',
+                            addclass: 'datetimerange',
+                            autocomplete: false,
+                            formatter: Table.api.formatter.datetime
+                        },
+                        {field: 'price', title: __('Price'), operate: 'BETWEEN'},
+                        {
+                            field: 'status',
+                            title: __('Status'),
+                            searchList: {"0": __('下架'), "1": __('上架')},
+                            formatter: Table.api.formatter.status
+                        },
+                        {
+                            field: 'operate',
+                            title: __('Operate'),
+                            table: table,
+                            events: Table.api.events.operate,
+                            formatter: Table.api.formatter.operate
+                        }
                     ]
                 ]
             });

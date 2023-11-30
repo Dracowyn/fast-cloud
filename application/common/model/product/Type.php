@@ -32,4 +32,9 @@ class Type extends Model
             $row->getQuery()->where($pk, $row[$pk])->update(['weigh' => $row[$pk]]);
         });
     }
+
+	public function getTypeList()
+	{
+		return $this->column('name', 'id');
+	}
 }

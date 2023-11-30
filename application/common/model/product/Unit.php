@@ -24,14 +24,11 @@ class Unit extends Model
     protected $append = [
 
     ];
-    
 
-    
-
-
-
-
-
+	public function getUnitList()
+	{
+		return $this->column('name', 'id');
+	}
 
 
 }
