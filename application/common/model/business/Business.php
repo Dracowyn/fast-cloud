@@ -7,9 +7,12 @@
 namespace app\common\model\business;
 
 use think\Model;
+use traits\model\SoftDelete;
 
 class Business extends Model
 {
+	use SoftDelete;
+
 	// 指向数据表
 	protected $name = 'business';
 
@@ -22,10 +25,15 @@ class Business extends Model
 	// 定义更新时间的字段名
 	protected $updateTime = 'update_time';
 
+	// 定义软删除的字段名
+	protected $deleteTime = 'delete_time';
+
 	// 追加数据表的不存在字段
 	protected $append = [
 		'mobile_text',
-		'avatar_cdn'
+		'avatar_cdn',
+		'create_time_text',
+		'update_time_text',
 	];
 
 	/**
@@ -54,5 +62,15 @@ class Business extends Model
 		}
 		$cdn = config('site.url');
 		return $cdn . $avatar;
+	}
+
+	protected function setCreateTimeAttr($value)
+	{
+		return $value === '' ? null : ($value && !is_numeric($value) ? strtotime($value) : $value);
+	}
+
+	protected function setUpdateTimeAttr($value)
+	{
+		return $value === '' ? null : ($value && !is_numeric($value) ? strtotime($value) : $value);
 	}
 }
