@@ -30,24 +30,58 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'id', title: __('Id')},
                         {field: 'mobile', title: __('Mobile'), operate: 'LIKE'},
                         {field: 'nickname', title: __('Nickname'), operate: 'LIKE'},
-                        {field: 'password', title: __('Password'), operate: 'LIKE'},
-                        {field: 'salt', title: __('Salt'), operate: 'LIKE'},
-                        {field: 'avatar', title: __('Avatar'), operate: 'LIKE', events: Table.api.events.image, formatter: Table.api.formatter.image},
-                        {field: 'gender', title: __('Gender'), searchList: {"0":__('Gender 0'),"1":__('Gender 1'),"2":__('Gender 2')}, formatter: Table.api.formatter.normal},
-                        {field: 'source_id', title: __('Source_id')},
-                        {field: 'deal', title: __('Deal'), searchList: {"0":__('Deal 0'),"1":__('Deal 1')}, formatter: Table.api.formatter.normal},
-                        {field: 'openid', title: __('Openid'), operate: 'LIKE'},
-                        {field: 'province', title: __('Province'), operate: 'LIKE'},
-                        {field: 'city', title: __('City'), operate: 'LIKE'},
-                        {field: 'district', title: __('District'), operate: 'LIKE'},
-                        {field: 'adminid', title: __('Adminid')},
-                        {field: 'create_time', title: __('Create_time'), operate:'RANGE', addclass:'datetimerange', autocomplete:false, formatter: Table.api.formatter.datetime},
-                        {field: 'update_time', title: __('Update_time'), operate:'RANGE', addclass:'datetimerange', autocomplete:false, formatter: Table.api.formatter.datetime},
-                        {field: 'delete_time', title: __('Delete_time'), operate:'RANGE', addclass:'datetimerange', autocomplete:false, formatter: Table.api.formatter.datetime},
-                        {field: 'money', title: __('Money'), operate:'BETWEEN'},
-                        {field: 'email', title: __('Email'), operate: 'LIKE', table: table, class: 'autocontent', formatter: Table.api.formatter.content},
-                        {field: 'auth', title: __('Auth'), searchList: {"0":__('Auth 0'),"1":__('Auth 1')}, formatter: Table.api.formatter.normal},
-                        {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
+                        {
+                            field: 'gender',
+                            title: __('Gender'),
+                            searchList: {"0": __('保密'), "1": __('男'), "2": __('女')},
+                            formatter: Table.api.formatter.normal
+                        },
+                        {
+                            field: 'email',
+                            title: __('Email'),
+                            operate: 'LIKE',
+                            table: table,
+                            class: 'autocontent',
+                            formatter: Table.api.formatter.content
+                        },
+                        {
+                            field: 'auth',
+                            title: __('Auth'),
+                            searchList: {"0": __('未认证'), "1": __('已认证')},
+                            formatter: Table.api.formatter.normal
+                        },
+                        {field: 'source.name', title: __('Source_id')},
+                        {field: 'admin.nickname', title: __('Adminid')},
+                        {field: 'money', title: __('Money'), operate: 'BETWEEN'},
+                        {
+                            field: 'deal',
+                            title: __('Deal'),
+                            searchList: {"0": __('未成交'), "1": __('已成交')},
+                            formatter: Table.api.formatter.normal
+                        },
+                        {
+                            field: 'create_time',
+                            title: __('Create_time'),
+                            operate: 'RANGE',
+                            addclass: 'datetimerange',
+                            autocomplete: false,
+                            formatter: Table.api.formatter.datetime
+                        },
+                        {
+                            field: 'update_time',
+                            title: __('Update_time'),
+                            operate: 'RANGE',
+                            addclass: 'datetimerange',
+                            autocomplete: false,
+                            formatter: Table.api.formatter.datetime
+                        },
+                        {
+                            field: 'operate',
+                            title: __('Operate'),
+                            table: table,
+                            events: Table.api.events.operate,
+                            formatter: Table.api.formatter.operate
+                        }
                     ]
                 ]
             });

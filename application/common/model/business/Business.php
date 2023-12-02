@@ -63,6 +63,21 @@ class Business extends Model
 		return $cdn . $avatar;
 	}
 
+	// 获取性别：0为未知，1为男性，2为女性
+	public function getGenderList()
+	{
+		return [0 => '保密', 1 => '男', 2 => '女'];
+	}
+
+	public function getDealList() {
+		return [0 => '未成交', 1 => '已成交'];
+	}
+
+	public function getAuthList()
+	{
+		return [0 => '未认证', 1 => '已认证'];
+	}
+
 	protected function setCreateTimeAttr($value)
 	{
 		return $value === '' ? null : ($value && !is_numeric($value) ? strtotime($value) : $value);
@@ -93,8 +108,14 @@ class Business extends Model
 		return is_numeric($value) ? date("Y-m-d H:i:s", $value) : $value;
 	}
 
+	// 关联客户来源
 	public function source()
 	{
 		return $this->belongsTo('app\common\model\business\Source', 'sourceid', 'id', [], 'LEFT')->setEagerlyType(0);
+	}
+
+	public function admin()
+	{
+		return $this->belongsTo('app\admin\model\Admin', 'adminid', 'id', [], 'LEFT')->setEagerlyType(0);
 	}
 }

@@ -120,7 +120,7 @@ class Index extends Controller
 			}
 
 			if ($source) {
-				$data['source_id'] = $source['id'];
+				$data['sourceid'] = $source['id'];
 			}
 
 			$result = $this->BusinessModel->validate('common/Business.register')->save($data);

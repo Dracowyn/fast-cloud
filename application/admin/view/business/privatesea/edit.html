@@ -41,7 +41,7 @@
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Gender')}:</label>
         <div class="col-xs-12 col-sm-8">
-                        
+
             <select  id="c-gender" class="form-control selectpicker" name="row[gender]">
                 {foreach name="genderList" item="vo"}
                     <option value="{$key}" {in name="key" value="$row.gender"}selected{/in}>{$vo}</option>
@@ -53,13 +53,13 @@
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Source_id')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-source_id" min="0" data-rule="required" data-source="source/index" class="form-control selectpage" name="row[source_id]" type="text" value="{$row.source_id|htmlentities}">
+            <input id="c-source_id" min="0" data-rule="required" data-source="source/index" class="form-control selectpage" name="row[sourceid]" type="text" value="{$row.sourceid|htmlentities}">
         </div>
     </div>
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Deal')}:</label>
         <div class="col-xs-12 col-sm-8">
-                        
+
             <select  id="c-deal" class="form-control selectpicker" name="row[deal]">
                 {foreach name="dealList" item="vo"}
                     <option value="{$key}" {in name="key" value="$row.deal"}selected{/in}>{$vo}</option>
@@ -131,7 +131,7 @@
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Auth')}:</label>
         <div class="col-xs-12 col-sm-8">
-                        
+
             <select  id="c-auth" class="form-control selectpicker" name="row[auth]">
                 {foreach name="authList" item="vo"}
                     <option value="{$key}" {in name="key" value="$row.auth"}selected{/in}>{$vo}</option>

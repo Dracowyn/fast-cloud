@@ -6,8 +6,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
             Table.api.init({
                 extend: {
                     index_url: 'business/highsea/index' + location.search,
-                    add_url: 'business/highsea/add',
-                    edit_url: 'business/highsea/edit',
+                    // add_url: 'business/highsea/add',
+                    // edit_url: 'business/highsea/edit',
                     del_url: 'business/highsea/del',
                     multi_url: 'business/highsea/multi',
                     import_url: 'business/highsea/import',
@@ -141,22 +141,6 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             searchList: {"0": __('保密'), "1": __('男'), "2": __('女')},
                             formatter: Table.api.formatter.normal
                         },
-                        {field: 'source.name', title: __('Source_id')},
-                        {
-                            field: 'deal',
-                            title: __('Deal'),
-                            searchList: {"0": __('未成交'), "1": __('已成交')},
-                            formatter: Table.api.formatter.normal
-                        },
-                        {
-                            field: 'delete_time',
-                            title: __('Delete_time'),
-                            operate: 'RANGE',
-                            addclass: 'datetimerange',
-                            autocomplete: false,
-                            formatter: Table.api.formatter.datetime
-                        },
-                        {field: 'money', title: __('Money'), operate: 'BETWEEN'},
                         {
                             field: 'email',
                             title: __('Email'),
@@ -170,6 +154,22 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             title: __('Auth'),
                             searchList: {"0": __('未认证'), "1": __('已认证')},
                             formatter: Table.api.formatter.normal
+                        },
+                        {field: 'source.name', title: __('Source_id')},
+                        {field: 'money', title: __('Money'), operate: 'BETWEEN'},
+                        {
+                            field: 'deal',
+                            title: __('Deal'),
+                            searchList: {"0": __('未成交'), "1": __('已成交')},
+                            formatter: Table.api.formatter.normal
+                        },
+                        {
+                            field: 'delete_time',
+                            title: __('Delete_time'),
+                            operate: 'RANGE',
+                            addclass: 'datetimerange',
+                            autocomplete: false,
+                            formatter: Table.api.formatter.datetime
                         },
                         {
                             field: 'operate',
