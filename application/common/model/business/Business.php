@@ -52,7 +52,6 @@ class Business extends Model
 	 * @param $value
 	 * @param array $data 当前整行数据
 	 * @return string 返回头像的完整路径
-
 	 */
 	public function getAvatarCdnAttr($value, array $data)
 	{
@@ -72,5 +71,30 @@ class Business extends Model
 	protected function setUpdateTimeAttr($value)
 	{
 		return $value === '' ? null : ($value && !is_numeric($value) ? strtotime($value) : $value);
+	}
+
+	public function getCreateTimeTextAttr($value, $data)
+	{
+		$value = $value ?: ($data['create_time'] ?? '');
+		return is_numeric($value) ? date("Y-m-d H:i:s", $value) : $value;
+	}
+
+
+	public function getUpdateTimeTextAttr($value, $data)
+	{
+		$value = $value ?: ($data['update_time'] ?? '');
+		return is_numeric($value) ? date("Y-m-d H:i:s", $value) : $value;
+	}
+
+
+	public function getDeleteTimeTextAttr($value, $data)
+	{
+		$value = $value ?: ($data['delete_time'] ?? '');
+		return is_numeric($value) ? date("Y-m-d H:i:s", $value) : $value;
+	}
+
+	public function source()
+	{
+		return $this->belongsTo('app\common\model\business\Source', 'sourceid', 'id', [], 'LEFT')->setEagerlyType(0);
 	}
 }
