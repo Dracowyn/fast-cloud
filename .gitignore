@@ -2,7 +2,7 @@
 /thinkphp/
 /vendor/
 /runtime/*
-/addons/*
+/addons/**/config.php
 /public/uploads/*
 .idea
 composer.lock
