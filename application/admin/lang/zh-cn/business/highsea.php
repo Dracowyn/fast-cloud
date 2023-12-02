@@ -4,6 +4,7 @@ return [
     'Id'          => '主键',
     'Mobile'      => '手机号',
     'Nickname'    => '昵称',
+	'UserNickname' => '用户昵称',
     'Password'    => '密码',
     'Salt'        => '密码盐',
     'Avatar'      => '头像',

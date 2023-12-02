@@ -8,6 +8,7 @@ use app\common\model\business\Business;
 use app\common\model\business\Receive;
 use app\common\model\business\Visit;
 use app\common\model\Region;
+use function EasyWeChat\Kernel\data_to_array;
 
 /**
  * 客户公海
@@ -120,9 +121,9 @@ class Highsea extends Backend
 				'busid' => $this->model->id,
 			];
 
-			$recevieStauts = $this->receiveModel->validate('common/business/Receive')->save($receiveData);
+			$receiveStarts = $this->receiveModel->validate('common/business/Receive')->save($receiveData);
 
-			if (!$recevieStauts && !$businessStatus) {
+			if (!$receiveStarts && !$businessStatus) {
 				$this->model->rollback();
 				$this->receiveModel->rollback();
 				// 删除头像
@@ -221,6 +222,118 @@ class Highsea extends Backend
 			$data['province'] = $province;
 			$data['city'] = $city;
 			$data['district'] = $district;
+		}
+	}
+
+	// 分配客户
+	public function allot($ids = null)
+	{
+		$ids = !empty($ids) ? explode(',', $ids) : [];
+		$row = $this->model->all($ids);
+
+
+		if (!$row) {
+			$this->error('客户不存在');
+		}
+
+		if ($this->request->isPost()) {
+			$list = [];
+			$businessList = [];
+
+			$params = $this->request->post('row/a');
+
+
+			foreach ($row as $item) {
+				$list[] = [
+					'applyid' => $params['adminid'],
+					'status' => 'allot',
+					'busid' => $item['id'],
+				];
+
+				$businessList[] = [
+					'id' => $item['id'],
+					'adminid' => $params['adminid'],
+				];
+
+			}
+
+
+			// 开启事务
+			$this->model->startTrans();
+			$this->receiveModel->startTrans();
+
+			// 更新客户表
+			$businessStatus = $this->model->saveAll($businessList);
+
+			// 更新申领表
+			$receiveStatus = $this->receiveModel->saveAll($list);
+
+			if (!$businessStatus && !$receiveStatus) {
+				$this->model->rollback();
+				$this->receiveModel->rollback();
+				$this->error($this->receiveModel->getError());
+			} else {
+				$this->model->commit();
+				$this->receiveModel->commit();
+				$this->success('申领成功');
+			}
+		}
+
+		$adminData = $this->adminModel->column('id,username');
+
+		$this->assign([
+			'AdminData' => $adminData,
+			'row' => $row
+		]);
+
+		return $this->view->fetch();
+	}
+
+	// 领取客户
+	public function receive($ids = null)
+	{
+		$ids = !empty($ids) ? explode(',', $ids) : [];
+		$row = $this->model->all($ids);
+
+		if (!$row) {
+			$this->error('客户不存在');
+		}
+
+		$list = [];
+		$businessList = [];
+
+		foreach ($row as $item) {
+			$list[] = [
+				'applyid' => $this->auth->id,
+				'status' => 'apply',
+				'busid' => $item['id'],
+			];
+
+			$businessList[] = [
+				'id' => $item['id'],
+				'adminid' => $this->auth->id,
+			];
+
+		}
+
+		// 开启事务
+		$this->model->startTrans();
+		$this->receiveModel->startTrans();
+
+		// 更新客户表
+		$businessStatus = $this->model->saveAll($businessList);
+
+		// 更新申领表
+		$receiveStatus = $this->receiveModel->saveAll($list);
+
+		if (!$businessStatus && !$receiveStatus) {
+			$this->model->rollback();
+			$this->receiveModel->rollback();
+			$this->error($this->receiveModel->getError());
+		} else {
+			$this->model->commit();
+			$this->receiveModel->commit();
+			$this->success('申请成功');
 		}
 	}
 
