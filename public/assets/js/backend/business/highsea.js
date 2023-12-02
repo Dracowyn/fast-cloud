@@ -11,8 +11,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     del_url: 'business/highsea/del',
                     multi_url: 'business/highsea/multi',
                     import_url: 'business/highsea/import',
-                    allot_url : 'business/highsea/allot',
-                    receive_url : 'business/highsea/receive',
+                    allot_url: 'business/highsea/allot',
+                    receive_url: 'business/highsea/receive',
                     table: 'business',
                 }
             });
@@ -91,7 +91,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     confirm: '确定要领取吗',
                                     title: '领取',
                                     extend: 'data-toggle="tooltip"',
-                                    classname: 'btn btn-xs btn-success btn-ajax btn-receive',
+                                    classname: 'btn btn-xs btn-success btn-ajax',
                                     url: 'business/highsea/receive?ids={id}',
                                     success: function (data, ret) {
                                         $(".btn-refresh").trigger("click");
@@ -110,6 +110,30 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     ]
                 ]
             });
+
+            $('.btn-receive').click(function () {
+                let ids = Table.api.selectedids(table);
+                ids = ids.toString()
+                layer.confirm('确定要领取吗?', {title: '领取', btn: ['是', '否']},
+                    function (index) {
+                        $.post("business/highsea/receive", {ids: ids}, function (response) {
+                            if (response.code === 1) {
+                                Toastr.success(response.msg)
+                                $(".btn-refresh").trigger('click');
+                            } else {
+                                Toastr.error(response.msg)
+                            }
+                        }, 'json');
+                        layer.close(index)
+                    }
+                );
+            })
+
+            $('.btn-allot').click(function () {
+                let ids = Table.api.selectedids(table);
+                ids = ids.toString()
+                Fast.api.open($.fn.bootstrapTable.defaults.extend.allot_url + "?ids=" + ids, '分配')
+            })
 
             // 为表格绑定事件
             Table.api.bindevent(table);

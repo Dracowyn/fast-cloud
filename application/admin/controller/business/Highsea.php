@@ -92,11 +92,6 @@ class Highsea extends Backend
 		return null;
 	}
 
-	public function del($ids = null)
-	{
-		return null;
-	}
-
 	// 分配客户
 	public function allot($ids = null)
 	{
