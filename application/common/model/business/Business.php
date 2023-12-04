@@ -34,6 +34,7 @@ class Business extends Model
 		'avatar_cdn',
 		'create_time_text',
 		'update_time_text',
+		'delete_time_text',
 		'gender_text',
 		'deal_text',
 		'region_text'

@@ -120,7 +120,7 @@ class Privateinfo extends Backend
 			list($where, $sort, $order, $offset, $limit) = $this->buildparams();
 
 			$list = $this->visitModel
-				->with('admin', 'business')
+				->with(['admin', 'business'])
 				->where($where)
 				->where('busid', $ids)
 				->order($sort, $order)
@@ -234,7 +234,7 @@ class Privateinfo extends Backend
 			list($where, $sort, $order, $offset, $limit) = $this->buildparams();
 
 			$list = $this->receiveModel
-				->with('admin', 'business')
+				->with(['admin', 'business'])
 				->where($where)
 				->where('busid', $ids)
 				->order($sort, $order)

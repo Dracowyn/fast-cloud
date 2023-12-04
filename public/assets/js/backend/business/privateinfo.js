@@ -44,9 +44,9 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         [
                             {checkbox: true},
                             {field: 'id', title: __('Id'), sortable: true},
-                            {field: 'business.nickname', title: __('Bnickname'), operate: 'LIKE'},
-                            {field: 'content', title: __('Vcontent'), operate: 'LIKE'},
-                            {field: 'admin.nickname', title: __('Dnickname'), sortable: false, searchable: false},
+                            {field: 'business.nickname', title: __('Nickname'), operate: 'LIKE'},
+                            {field: 'content', title: __('Content'), operate: 'LIKE'},
+                            {field: 'admin.nickname', title: __('AdminNickname'), sortable: false, searchable: false},
                             {
                                 field: 'createtime',
                                 title: __('VisitCreateTime'),
@@ -85,12 +85,12 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         [
                             {checkbox: true},
                             {field: 'id', title: __('Id'), sortable: true},
-                            {field: 'business.nickname', title: __('Bnickname'), operate: 'LIKE'},
-                            {field: 'admin.nickname', title: __('Dnickname'), sortable: false, searchable: false},
-                            {field: 'status_text', title: __('VstatusText'), sortable: false, searchable: false},
+                            {field: 'business.nickname', title: __('Nickname'), operate: 'LIKE'},
+                            {field: 'admin.nickname', title: __('AdminNickname'), sortable: false, searchable: false},
+                            {field: 'status_text', title: __('StatusText'), sortable: false, searchable: false},
                             {
                                 field: 'applytime',
-                                title: __('Rapplytime'),
+                                title: __('Applytime'),
                                 sortable: true,
                                 searchable: true,
                                 formatter: Table.api.formatter.datetime,
