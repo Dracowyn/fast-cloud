@@ -46,8 +46,8 @@ class Index extends \think\addons\Controller
 			$wechatService = new WechatService;
 
 			$matches = null;
-			$openid = $message['FromUserName'];
-			$to_openid = $message['ToUserName'];
+			$openid = $message['FromUserName']; // 发送方
+			$to_openid = $message['ToUserName'];// 接收方（该公众号id）
 
 			$unknownMessage = WechatConfig::getValue('default.unknown.message');
 			$unknownMessage = $unknownMessage ? $unknownMessage : "";
@@ -72,6 +72,13 @@ class Index extends \think\addons\Controller
 							return '';
 						case 'SCAN': //扫码
 							return '';
+
+						case 'CLICK':
+							if ($eventkey == 'order') {
+								return $this->getOrder($openid);
+							}
+							break;
+
 						default:
 							break;
 					}
@@ -89,9 +96,6 @@ class Index extends \think\addons\Controller
 						$result = $wechatService->response($this, $openid, '', $responseContent, $wechatContext);
 						if ($result) {
 							return $result;
-						}
-						if (in_array($message['Content'], [1, 'help', 'h', '菜单'])) {
-							return new Text("菜单使用\n1、回复以下关键字可重新获取菜单：[1，help，菜单，h]\n2、需要获取相关课程可回复课程名称（例）：课程：PHP");
 						}
 					}
 					return $unknownMessage;
@@ -125,6 +129,13 @@ class Index extends \think\addons\Controller
 								}
 							}
 						}
+
+
+						// 菜单回复
+						if (in_array($message['Content'], [1, 'help', 'h', '菜单'])) {
+							return new Text("菜单使用\n1、回复以下关键字可重新获取菜单：[1，help，菜单，h]\n2、需要获取相关课程可回复课程名称（例）：课程：PHP");
+						}
+
 					}
 					return $unknownMessage;
 			}
@@ -137,12 +148,89 @@ class Index extends \think\addons\Controller
 		return;
 	}
 
+	public function menu()
+	{
+		// 菜单数组
+		$buttons = [
+			[
+				// 网页
+				"type" => "view",
+				// 菜单名称
+				"name" => "云课堂",
+				// 网页地址
+				"url" => "https://api.dracowyn.com/home"
+			],
+			[
+				"name" => "商城",
+				"sub_button" => [
+					[
+						"type" => "view",
+						"name" => "搜索",
+						"url" => "https://www.soso.com/"
+					],
+					[
+						"type" => "view",
+						"name" => "视频",
+						"url" => "https://v.qq.com/"
+					],
+					[
+						"type" => "click",
+						"name" => "赞一下我们",
+						"key" => "V1001_GOOD"
+					],
+				],
+			],
+			[
+				"name" => "我的",
+				"sub_button" => [
+					[
+						"type" => 'click',
+						"name" => '我的订单',
+						"key" => 'order'
+					]
+				]
+			]
+		];
+
+		// 调用menu对象创建一个菜单
+		$result = $this->app->menu->create($buttons);
+
+		if ($result) {
+			echo '创建菜单成功';
+		} else {
+			echo '创建菜单失败';
+		}
+	}
+
+	// 获取我的订单
+	public function getOrder($openid)
+	{
+		$business = model('common/business/Business')->where(['openid' => $openid])->find();
+
+		if (!$business) {
+			$response = $this->app->oauth->scopes(['snsapi_userinfo'])
+				->redirect();
+
+			return $response->send();
+		}
+	}
+
 	/**
 	 * 登录回调
 	 */
 	public function callback()
 	{
+		$user = $this->app->oauth->user();
 
+		$openid = $user->getId();
+
+		if (!$openid) {
+
+			// $content = '<a href="http://www.class.fast.zmlover.cn/home/index/login">您未授权，请授权</a>';
+			file_put_contents('./demo.txt', $openid);
+			// return new Text('文本');
+			// $this->error('未授权',url('home/index/login'));
+		}
 	}
 
 	/**
