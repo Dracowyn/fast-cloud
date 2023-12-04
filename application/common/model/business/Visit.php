@@ -14,7 +14,7 @@ class Visit extends Model
 	protected $name = "business_visit";
 
 	protected $autoWriteTimestamp = true;
-	protected $createTime = "create_time"; //插入的时候设置的字段名
+	protected $createTime = "createtime"; //插入的时候设置的字段名
 	protected $updateTime = false;
 
 	public function admin()

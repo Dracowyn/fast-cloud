@@ -21,6 +21,7 @@ return [
 	'Delete_time' => '删除时间',
 	'Money' => '余额',
 	'Email' => '邮箱',
-	'Auth' => '认证状态'
+	'Auth' => '认证状态',
+	'Recovery' => '客户回收',
 ];
 

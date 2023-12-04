@@ -8,7 +8,6 @@ use app\common\model\business\Business;
 use app\common\model\business\Receive;
 use app\common\model\business\Visit;
 use app\common\model\Region;
-use function EasyWeChat\Kernel\data_to_array;
 
 /**
  * 客户公海

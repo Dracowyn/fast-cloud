@@ -1,6 +1,6 @@
 define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefined, Backend, Table, Form) {
 
-    var Controller = {
+    const Controller = {
         index: function () {
             // 初始化表格参数配置
             Table.api.init({
@@ -11,11 +11,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     del_url: 'business/privatesea/del',
                     multi_url: 'business/privatesea/multi',
                     import_url: 'business/privatesea/import',
+                    recovery_url: 'business/privatesea/recovery',
+                    detail_url: 'business/privateinfo/index',
                     table: 'business',
                 }
             });
 
-            var table = $("#table");
+            const table = $("#table");
 
             // 初始化表格
             table.bootstrapTable({
@@ -80,10 +82,55 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             title: __('Operate'),
                             table: table,
                             events: Table.api.events.operate,
-                            formatter: Table.api.formatter.operate
+                            formatter: Table.api.formatter.operate,
+                            buttons: [
+                                {
+                                    name: 'business',
+                                    title: '客户详情',
+                                    extend: 'data-toggle="tooltip"',
+                                    classname: "btn btn-xs btn-primary btn-dialog vivst_test",
+                                    icon: 'fa fa-eye',
+                                    url: $.fn.bootstrapTable.defaults.extend.detail_url,
+                                },
+                                {
+                                    name: 'recovery',
+                                    confirm: '确定要回收吗？',
+                                    title: '客户回收',
+                                    classname: 'btn btn-xs btn-success btn-ajax',
+                                    icon: 'fa fa-recycle',
+                                    extend: 'data-toggle="tooltip"',
+                                    url: $.fn.bootstrapTable.defaults.extend.recovery_url,
+                                    refresh: true
+                                }
+                            ],
                         }
                     ]
                 ]
+            });
+
+            $('.btn-reduction').on('click', function () {
+                let ids = Table.api.selectedids(table);
+                ids = ids.toString()
+                layer.confirm('确定要回收吗?', {title: '回收', btn: ['是', '否']},
+                    function (index) {
+
+                        $.post($.fn.bootstrapTable.defaults.extend.recovery_url, {
+                            ids: ids,
+                            action: 'success',
+                            reply: ''
+                        }, function (response) {
+                            if (response.code === 1) {
+                                Toastr.success(response.msg)
+                                $(".btn-refresh").trigger('click');
+                            } else {
+                                Toastr.error(response.msg)
+                            }
+                        }, 'json');
+
+                        layer.close(index);
+                    }
+                );
+
             });
 
             // 为表格绑定事件

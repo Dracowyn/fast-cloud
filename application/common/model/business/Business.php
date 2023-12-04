@@ -34,6 +34,9 @@ class Business extends Model
 		'avatar_cdn',
 		'create_time_text',
 		'update_time_text',
+		'gender_text',
+		'deal_text',
+		'region_text'
 	];
 
 	/**
@@ -69,7 +72,8 @@ class Business extends Model
 		return [0 => '保密', 1 => '男', 2 => '女'];
 	}
 
-	public function getDealList() {
+	public function getDealList()
+	{
 		return [0 => '未成交', 1 => '已成交'];
 	}
 
@@ -106,6 +110,51 @@ class Business extends Model
 	{
 		$value = $value ?: ($data['delete_time'] ?? '');
 		return is_numeric($value) ? date("Y-m-d H:i:s", $value) : $value;
+	}
+
+	// 获取性别
+	public function getGenderTextAttr($value, $data)
+	{
+		$genderList = [0 => '保密', 1 => '男', 2 => '女'];
+
+		$gender = $data['gender'] ?? '';
+
+		if ($gender >= '0') {
+			return $genderList[$gender];
+		}
+		return null;
+	}
+
+	// 成交状态
+	public function getDealTextAttr($value, $data)
+	{
+		$dealList = [0 => '未成交', 1 => '已成交'];
+
+		$deal = $data['deal'] ?? '';
+
+		if ($deal >= '0') {
+			return $dealList[$deal];
+		}
+		return null;
+	}
+
+	// 获取地区
+	public function getRegionTextAttr($value, $data)
+	{
+		$province = model('Region')->where(['code' => $data['province']])->find();
+		$city = model('Region')->where(['code' => $data['city']])->find();
+		$district = model('Region')->where(['code' => $data['district']])->find();
+		$output = [];
+		if ($province) {
+			$output[] = $province['name'];
+		}
+		if ($city) {
+			$output[] = $city['name'];
+		}
+		if ($district) {
+			$output[] = $district['name'];
+		}
+		return implode('-', $output);
 	}
 
 	// 关联客户来源

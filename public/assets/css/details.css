@@ -77,6 +77,7 @@ p {
 
 #cover{
   height: 274px;
+  position: relative;
 }
 
 #cover .cover_bg{
@@ -84,7 +85,9 @@ p {
 }
 
 #play{
-  width:100%; height:70vw; text-align:center; line-height:80vw; position:absolute; top:0;
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
 }
 
 #play img{
