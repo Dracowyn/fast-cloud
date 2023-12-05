@@ -249,7 +249,7 @@ class Index extends \think\addons\Controller
 
 		if (!$business) {
 			// 返回一个文本地址给用户进行绑定
-			$url = url('/home/index/bind', null, true, true);
+			$url = url('/home/index/bind', ['openid' => $openid], true, true);
 			$content = "<a href='{$url}'>您未授权，无法查询！请先绑定</a>";
 			return new Text($content);
 		}
