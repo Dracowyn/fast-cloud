@@ -255,9 +255,9 @@ class Index extends \think\addons\Controller
 		}
 
 		// 根据用户id获取所有的该用户订单
-		$orderIds = model('common/subject/Order')->where(['busid' => $business['id']])->column('id');
+		$orderIds = model('common/business/Order')->where(['busid' => $business['id']])->column('id');
 
-		$orderData = model('common/subject/Order')->with(['subject'])->where(['order.id' => ['IN', $orderIds]])->select();
+		$orderData = model('common/business/Order')->with(['subject'])->where(['order.id' => ['IN', $orderIds]])->select();
 
 		if (empty($orderData)) {
 			return new Text('暂无订单记录');
