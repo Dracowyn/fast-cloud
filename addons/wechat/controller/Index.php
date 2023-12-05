@@ -12,6 +12,8 @@ use addons\wechat\model\WechatConfig;
 use EasyWeChat\Factory;
 use addons\wechat\library\Wechat as WechatService;
 use addons\wechat\library\Config as ConfigService;
+use EasyWeChat\Kernel\Messages\News;
+use EasyWeChat\Kernel\Messages\NewsItem;
 use EasyWeChat\Kernel\Messages\Text;
 use think\Log;
 
@@ -63,7 +65,7 @@ class Index extends \think\addons\Controller
 					switch ($event) {
 						case 'subscribe'://添加关注
 							$subscribeMessage = WechatConfig::getValue('default.subscribe.message');
-							return $subscribeMessage ?: "欢迎关注云平台\n菜单使用\n1、回复以下关键字可重新获取菜单：[1，help，菜单，h]\n2、需要获取相关课程可回复课程名称（例）：课程：PHP";
+							return $subscribeMessage ?: "欢迎关注云平台\n菜单使用\n1、回复以下关键字可重新获取菜单：[1，help，菜单，h]\n2、需要获取相关课程可回复课程名称（例）：课程：PHP\n3、需要获取自己购买的订单请回复：我的订单";
 						case 'unsubscribe'://取消关注
 							return '';
 						case 'LOCATION'://获取地理位置
@@ -133,7 +135,27 @@ class Index extends \think\addons\Controller
 
 						// 菜单回复
 						if (in_array($message['Content'], [1, 'help', 'h', '菜单'])) {
-							return new Text("菜单使用\n1、回复以下关键字可重新获取菜单：[1，help，菜单，h]\n2、需要获取相关课程可回复课程名称（例）：课程：PHP");
+							return new Text("菜单使用\n1、回复以下关键字可重新获取菜单：[1，help，菜单，h]\n2、需要获取相关课程可回复课程名称（例）：课程：PHP\n3、需要获取自己购买的订单请回复：我的订单");
+						}
+
+						if (strpos($message['Content'], '课程') !== false) {
+							$str = preg_replace('/:|：/', ':', $message['Content']);
+
+							// 用正则获取课程名称
+							preg_match('/课程:(.*)/', $str, $res);
+
+							$subjectName = $res[1] ?? '';
+
+							if (!$subjectName) {
+								return new Text('回复格式不正确');
+							}
+
+							return new Text($subjectName);
+						}
+
+						// 关键字：我的订单
+						if (trim($message['Content']) === '我的订单') {
+							return $this->getOrder($openid);
 						}
 
 					}
@@ -153,12 +175,22 @@ class Index extends \think\addons\Controller
 		// 菜单数组
 		$buttons = [
 			[
-				// 网页
-				"type" => "view",
-				// 菜单名称
-				"name" => "云课堂",
-				// 网页地址
-				"url" => "https://api.dracowyn.com/home"
+				"name" => '云课堂',
+				'sub_button' => [
+					[
+						// 网页
+						"type" => "view",
+						// 菜单名称
+						"name" => "官网",
+						// 网页地址
+						"url" => "https://api.dracowyn.com"
+					],
+					[
+						"type" => "click",
+						"name" => "全部课程",
+						"key" => "subject"
+					]
+				]
 			],
 			[
 				"name" => "商城",
@@ -205,14 +237,44 @@ class Index extends \think\addons\Controller
 	// 获取我的订单
 	public function getOrder($openid)
 	{
+		$openid = empty($openid) ? session('openid') : $openid;
+
+		if (!$openid) {
+			$result = $this->app->oauth->scopes(['snsapi_userinfo'])->redirect();
+
+			return $result->send();
+		}
+
 		$business = model('common/business/Business')->where(['openid' => $openid])->find();
 
 		if (!$business) {
-			$response = $this->app->oauth->scopes(['snsapi_userinfo'])
-				->redirect();
-
-			return $response->send();
+			// 返回一个文本地址给用户进行绑定
+			$url = url('/home/index/bind', null, true, true);
+			$content = "<a href='{$url}'>您未授权，无法查询！请先绑定</a>";
+			return new Text($content);
 		}
+
+		// 根据用户id获取所有的该用户订单
+		$orderIds = model('common/subject/Order')->where(['busid' => $business['id']])->column('id');
+
+		$orderData = model('common/subject/Order')->with(['subject'])->where(['order.id' => ['IN', $orderIds]])->select();
+
+		if (empty($orderData)) {
+			return new Text('暂无订单记录');
+		}
+
+		$data = [];
+
+		foreach ($orderData as $item) {
+			$data[] = new NewsItem([
+				'title' => "您购买课程{$item['subject']['title']}",
+				'description' => "订单号：{$item['code']}，共消费了￥ {$item['total']}元",
+				'url' => url('/home/subject/subject/info', ['subid' => $item['subid']], true, true),
+				'image' => $item['subject']['thumbs_cdn']
+			]);
+		}
+
+		return new News($data);
 	}
 
 	/**
@@ -224,13 +286,21 @@ class Index extends \think\addons\Controller
 
 		$openid = $user->getId();
 
-		if (!$openid) {
-
-			// $content = '<a href="http://www.class.fast.zmlover.cn/home/index/login">您未授权，请授权</a>';
-			file_put_contents('./demo.txt', $openid);
-			// return new Text('文本');
-			// $this->error('未授权',url('home/index/login'));
+		if (empty($openid)) {
+			$this->error('获取不到授权', url('/home/index/login'));
 		}
+
+		$business = model('common/business/Business')->where(['openid' => $openid])->find();
+
+		if (!$business) {
+			$this->error('您未绑定账号，请先绑定账号', url('/home/index/bind', ['openid' => $openid]));
+		}
+
+		session('openid', $openid);
+
+		cookie('business', ['id' => $business['id'], 'mobile' => $business['mobile'], 'openid' => $business['openid']]);
+
+		$this->success('授权成功', url('/home/subject/order/index'));
 	}
 
 	/**
