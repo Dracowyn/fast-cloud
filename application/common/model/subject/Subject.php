@@ -45,7 +45,7 @@ class Subject extends Model
 		if (!is_file('.' . $thumbs)) {
 			$thumbs = '/assets/images/web.jpg';
 		}
-		$cdn = model('Common/Config')->where(['name' => 'url'])->value('value');
+		$cdn = model('common/Config')->where(['name' => 'url'])->value('value');
 		$cdn = Env::get('site.url', $cdn);
 		return $cdn . $thumbs;
 	}

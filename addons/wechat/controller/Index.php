@@ -153,6 +153,17 @@ class Index extends \think\addons\Controller
 							return new Text($subjectName);
 						}
 
+						// 获取天气
+						if (strpos($message['Content'], '天气') !== false) {
+							// 用正则获取城市名称
+							preg_match('/(.*)天气/', $message['Content'], $res);
+							$city = $res[1] ?? '';
+							if (!$city) {
+								return new Text('回复格式不正确');
+							}
+							return $this->getWeather($city);
+						}
+
 						// 关键字：我的订单
 						if (trim($message['Content']) === '我的订单') {
 							return $this->getOrder($openid);
@@ -318,6 +329,73 @@ class Index extends \think\addons\Controller
 
 		$response->send();
 		return;
+	}
+
+	/**
+	 * 获取天气
+	 */
+	public function getWeather($city)
+	{
+		// 服务接口
+		$url = "https://restapi.amap.com/v3/weather/weatherInfo";
+		// 通过common/Config的weather_key获取key
+		$key = model('common/Config')->where(['name' => 'weather_key'])->value('value');
+		// 获取城市
+		$city = $city ?: '北京';
+		// 拼接url
+		$url .= "?key={$key}&city={$city}";
+		// 通过file_get_contents发送Get请求
+		$result = file_get_contents($url);
+		// 将json字符串转换为数组
+		$result = json_decode($result, true);
+		// 数据格式参考
+		//{
+		//    "status": "1",
+		//    "count": "1",
+		//    "info": "OK",
+		//    "infocode": "10000",
+		//    "lives": [
+		//        {
+		//            "province": "北京",
+		//            "city": "北京市",
+		//            "adcode": "110000",
+		//            "weather": "多云",
+		//            "temperature": "6",
+		//            "winddirection": "东",
+		//            "windpower": "≤3",
+		//            "humidity": "39",
+		//            "reporttime": "2023-12-05 17:10:09",
+		//            "temperature_float": "6.0",
+		//            "humidity_float": "39.0"
+		//        }
+		//    ]
+		//}
+		// 判断是否请求成功
+		if ($result['count'] >= 1) {
+			// 更新时间转换成时间戳
+			$result['lives'][0]['reporttime'] = strtotime($result['lives'][0]['reporttime']);
+			// 拼接天气信息
+			$data = "省份：{$result['lives'][0]['province']}
+			城市：{$result['lives'][0]['city']}
+			天气：{$result['lives'][0]['weather']}
+			温度：{$result['lives'][0]['temperature']}℃
+			湿度：{$result['lives'][0]['humidity']}%
+			风向：{$result['lives'][0]['winddirection']}
+			风力：{$result['lives'][0]['windpower']}
+			更新时间：{$result['lives'][0]['reporttime']}";
+			// 删除空格与Tab
+			$data = str_replace(["\t", " "], "", $data);
+			// 将更新时间转换回去
+			$data = str_replace($result['lives'][0]['reporttime'], date('Y-m-d H:i:s', $result['lives'][0]['reporttime']), $data);
+
+			// 返回天气信息
+			return new Text($data);
+		} elseif ($result['count'] <= 0) {
+			return new Text("城市不存在");
+		} else {
+			return new Text("系统错误");
+		}
+
 	}
 
 }

@@ -110,7 +110,7 @@ class Privatesea extends Backend
 			$this->model->startTrans();
 			$this->receiveModel->startTrans();
 
-			$businessStatus = $this->model->validate('common/business/Business.register')->save($data);
+			$businessStatus = $this->model->validate('common/business/Business.profile')->save($data);
 
 			if (!$businessStatus) {
 				$this->model->rollback();

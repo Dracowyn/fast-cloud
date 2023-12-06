@@ -8,7 +8,9 @@
 
 namespace app\home\controller\subject;
 
+use addons\wechat\library\Config;
 use app\common\controller\Home;
+use EasyWeChat\Factory;
 
 class Subject extends Home
 {
@@ -26,6 +28,11 @@ class Subject extends Home
 	// 订单模型
 	protected $OrderModel = null;
 
+	/*
+	 * 微信模型
+	 */
+	protected $wechatModel = null;
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -33,6 +40,7 @@ class Subject extends Home
 		$this->CommentModel = model('subject.Comment');
 		$this->ChapterModel = model('subject.Chapter');
 		$this->OrderModel = model('business.Order');
+		$this->wechatModel = Factory::officialAccount(Config::load());
 	}
 
 	// 搜索课程
@@ -297,6 +305,19 @@ class Subject extends Home
 				$this->OrderModel->commit();
 				$businessModel->commit();
 				$recordModel->commit();
+				// 购买成功后发送一条消息给用户
+				if ($this->auth->openid) {
+					$this->wechatModel->template_message->send([
+						'touser' => $this->auth->openid,
+						'template_id' => 'OlhTC_SjoCsYT5HDw64k5WkyRsHHOE4k_TF7YG8MV9s',
+						'data' => [
+							'code' => $orderData['code'],
+							'title' => $subject['title'],
+							'price' => $orderData['total'],
+							'crearetime' => date('Y-m-d H:i',time())
+						],
+					]);
+				}
 				$this->success('购买成功');
 			} else {
 				$this->OrderModel->rollback();

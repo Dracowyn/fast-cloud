@@ -134,4 +134,53 @@ class Index extends Controller
 
 		return $this->fetch();
 	}
+
+	/**
+	 * 绑定微信
+	 * bind/openid/xxxxx
+	 */
+	public function bind($openid = null)
+	{
+		if (empty($openid)) {
+			$this->error('参数错误');
+		}
+		if ($this->request->isPost()) {
+			$mobile = $this->request->param('mobile', '', 'trim');
+			$password = $this->request->param('password', '', 'trim');
+
+			if (empty($mobile) || empty($password)) {
+				$this->error('手机号或密码不能为空');
+			}
+
+			$business = $this->BusinessModel->where('mobile', $mobile)->find();
+
+			if (!$business) {
+				$this->error('手机号未注册');
+			}
+
+			$password = md5(md5($password) . $business['salt']);
+
+			if ($password != $business['password']) {
+				$this->error('密码错误');
+			}
+
+			$data = [
+				'id' => $business['id'],
+				'nickname' => $business['nickname'],
+				'mobile' => $business['mobile'],
+				'avatar' => $business['avatar'],
+				'auth' => $business['auth'],
+			];
+
+			cookie('business', $data, 3600 * 24 * 7);
+
+			$result = $this->BusinessModel->where('id', $business['id'])->update(['openid' => $openid]);
+			if ($result === false) {
+				$this->error('绑定失败');
+			}
+			$this->success('绑定成功', url('home/business/index'));
+		}
+
+		return $this->fetch();
+	}
 }

@@ -9,7 +9,7 @@ namespace app\common\validate\business;
 
 use think\Validate;
 
-class Recevie extends Validate
+class Receive extends Validate
 {
 	// 验证规则
 	protected $rule = [
