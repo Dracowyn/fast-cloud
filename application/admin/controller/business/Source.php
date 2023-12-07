@@ -14,14 +14,14 @@ class Source extends Backend
 
     /**
      * Source模型对象
-     * @var \app\admin\model\business\Source
+     * @var \app\common\model\business\Source
      */
     protected $model = null;
 
     public function _initialize()
     {
         parent::_initialize();
-        $this->model = new \app\admin\model\business\Source;
+        $this->model = new \app\common\model\business\Source;
 
     }
 

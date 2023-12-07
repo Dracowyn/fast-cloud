@@ -63,17 +63,10 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="control-label col-xs-12 col-sm-2">{:__('Province')}:</label>
-        <div class="col-xs-12 col-sm-8">
-            <input id="c-province" class="form-control" name="row[province]" type="text" value="{$row.province|htmlentities}">
-        </div>
-    </div>
-    <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">地区选择:</label>
         <div class="col-xs-12 col-sm-10 region_city">
-            <input id="region" readonly type="text" data-toggle="city-picker" value="{$row['regionCode']}">
-            <!-- 用于提交数据把选中的地区传给后端处理 -->
-            <input type="hidden" name="row[code]" id="region-code" >
+            <input id="region" readonly type="text" data-toggle="city-picker" value="{$row.district ? $row.district : ($row.city ? $row.city : $row.province)}">
+            <input type="hidden" name="row[code]" id="code" value="{$row.district ? $row.district : ($row.city ? $row.city : $row.province)}">
         </div>
     </div>
     <div class="form-group">

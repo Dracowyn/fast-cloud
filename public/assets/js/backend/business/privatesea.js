@@ -138,9 +138,19 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
         },
         add: function () {
             Controller.api.bindevent();
+            $("#region").on("cp:updated", function () {
+                const cityPicker = $(this).data("citypicker");
+                const code = cityPicker.getCode("district") || cityPicker.getCode("city") || cityPicker.getCode("province");
+                $('#code').val(code);
+            })
         },
         edit: function () {
             Controller.api.bindevent();
+            $("#region").on("cp:updated", function () {
+                const cityPicker = $(this).data("citypicker");
+                const code = cityPicker.getCode("district") || cityPicker.getCode("city") || cityPicker.getCode("province");
+                $('#code').val(code);
+            })
         },
         api: {
             bindevent: function () {
@@ -150,3 +160,4 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
     };
     return Controller;
 });
+

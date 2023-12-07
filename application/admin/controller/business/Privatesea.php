@@ -8,6 +8,7 @@ use app\common\model\business\Address;
 use app\common\model\business\Business;
 use app\common\model\business\Receive;
 use app\common\model\business\Visit;
+use app\common\model\Region;
 
 /**
  * 客户私海
@@ -42,6 +43,11 @@ class Privatesea extends Backend
 	 */
 	protected $addressModel = null;
 
+	/*
+	 * 地区模型
+	 */
+	protected $regionModel = null;
+
 	public function _initialize()
 	{
 		parent::_initialize();
@@ -50,6 +56,7 @@ class Privatesea extends Backend
 		$this->visitModel = new Visit;
 		$this->adminModel = new Admin;
 		$this->addressModel = new Address;
+		$this->regionModel = new Region;
 		$this->assign('genderList', $this->model->getGenderList());
 		$this->assign('dealList', $this->model->getDealList());
 		$this->assign('authList', $this->model->getAuthList());
@@ -89,6 +96,12 @@ class Privatesea extends Backend
 
 			$password = md5(md5($param['password']) . $salt);
 
+			$parentPath = model('Region')->where(['code' => $param['code']])->value('parentpath');
+			if (!$parentPath) {
+				$this->error('地区选择有误');
+			}
+			$pathArr = explode(',', $parentPath);
+
 			$data = [
 				'nickname' => $param['nickname'],
 				'mobile' => $param['mobile'],
@@ -100,11 +113,11 @@ class Privatesea extends Backend
 				'adminid' => $this->auth->id,
 				'gender' => $param['gender'],
 				'auth' => $param['auth'],
-				'money' => $param['money']
+				'money' => $param['money'],
+				'province' => $pathArr[0] ?? null,
+				'city' => $pathArr[1] ?? null,
+				'district' => $pathArr[2] ?? null,
 			];
-
-			// 判断地区编码是否存在
-			$this->findCode($param, $data);
 
 			// 开启事务
 			$this->model->startTrans();
@@ -154,6 +167,12 @@ class Privatesea extends Backend
 		if ($this->request->isPost()) {
 			$param = $this->request->param('row/a');
 
+			$parentPath = model('Region')->where(['code' => $param['code']])->value('parentpath');
+			if (!$parentPath) {
+				$this->error('地区选择有误');
+			}
+			$pathArr = explode(',', $parentPath);
+
 			$data = [
 				'id' => $ids,
 				'nickname' => $param['nickname'],
@@ -164,7 +183,10 @@ class Privatesea extends Backend
 				'gender' => $param['gender'],
 				'auth' => $param['auth'],
 				'money' => $param['money'],
-				'deal' => $param['deal']
+				'deal' => $param['deal'],
+				'province' => $pathArr[0] ?? null,
+				'city' => $pathArr[1] ?? null,
+				'district' => $pathArr[2] ?? null,
 			];
 
 			// 修改密码
@@ -174,9 +196,6 @@ class Privatesea extends Backend
 				$data['password'] = $password;
 				$data['salt'] = $salt;
 			}
-
-			// 判断地区编码是否存在
-			$this->findCode($param, $data);
 
 			$result = $this->model->validate('common/business/Business.profile')->isUpdate()->save($data);
 
@@ -199,31 +218,5 @@ class Privatesea extends Backend
 		]);
 
 		return $this->view->fetch();
-	}
-
-	/**
-	 * 查找地区编码
-	 * @param $param
-	 * @param array $data
-	 * @return void
-	 */
-	public function findCode($param, array &$data): void
-	{
-		if (!empty($param['code'])) {
-			$parentPath = $this->regionModel->where('code', $param['code'])->value('parentpath');
-			if (!$parentPath) {
-				$this->error('地区编码错误');
-			}
-
-			$path = explode(',', $parentPath);
-
-			$province = $path[0] ?? null;
-			$city = $path[1] ?? null;
-			$district = $path[2] ?? null;
-
-			$data['province'] = $province;
-			$data['city'] = $city;
-			$data['district'] = $district;
-		}
 	}
 }
