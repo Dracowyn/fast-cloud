@@ -1,10 +1,10 @@
 <?php
 
-namespace app\admin\validate\business;
+namespace app\common\validate\depot;
 
 use think\Validate;
 
-class Source extends Validate
+class Back extends Validate
 {
     /**
      * 验证规则
