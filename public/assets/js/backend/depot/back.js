@@ -1,6 +1,6 @@
 define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefined, Backend, Table, Form) {
 
-    var Controller = {
+    const Controller = {
         index: function () {
             // 初始化表格参数配置
             Table.api.init({
@@ -15,7 +15,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 }
             });
 
-            var table = $("#table");
+            const table = $("#table");
 
             // 初始化表格
             table.bootstrapTable({
@@ -29,24 +29,42 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {checkbox: true},
                         {field: 'id', title: __('Id')},
                         {field: 'code', title: __('Code'), operate: 'LIKE'},
-                        {field: 'ordercode', title: __('Ordercode'), operate: 'LIKE', table: table, class: 'autocontent', formatter: Table.api.formatter.content},
-                        {field: 'busid', title: __('Busid')},
-                        {field: 'contact', title: __('Contact'), operate: 'LIKE', table: table, class: 'autocontent', formatter: Table.api.formatter.content},
-                        {field: 'phone', title: __('Phone'), operate: 'LIKE', table: table, class: 'autocontent', formatter: Table.api.formatter.content},
-                        {field: 'address', title: __('Address'), operate: 'LIKE', table: table, class: 'autocontent', formatter: Table.api.formatter.content},
-                        {field: 'province', title: __('Province')},
-                        {field: 'city', title: __('City')},
-                        {field: 'district', title: __('District')},
-                        {field: 'amount', title: __('Amount'), operate:'BETWEEN'},
-                        {field: 'expressid', title: __('Expressid')},
-                        {field: 'expresscode', title: __('Expresscode'), operate: 'LIKE', table: table, class: 'autocontent', formatter: Table.api.formatter.content},
-                        {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', autocomplete:false, formatter: Table.api.formatter.datetime},
-                        {field: 'status', title: __('Status'), searchList: {"0":__('Status 0'),"1":__('Status 1'),"2":__('Status 2'),"3":__('Status 3'),"-1":__('Status -1')}, formatter: Table.api.formatter.status},
+                        {field: 'ordercode', title: __('Ordercode'), operate: 'LIKE'},
+                        {field: 'business.nickname', title: __('Busid')},
+                        {field: 'contact', title: __('Contact'), operate: 'LIKE'},
+                        {field: 'phone', title: __('Phone'), operate: 'LIKE'},
+                        {field: 'amount', title: __('Amount'), operate: 'BETWEEN'},
+                        {
+                            field: 'createtime',
+                            title: __('Createtime'),
+                            operate: 'RANGE',
+                            addclass: 'datetimerange',
+                            autocomplete: false,
+                            formatter: Table.api.formatter.datetime
+                        },
+                        {
+                            field: 'status',
+                            title: __('Status'),
+                            searchList: {
+                                "0": __('未审核'),
+                                "1": __('已审核，未收货'),
+                                "2": __('已收货，未入库'),
+                                "3": __('已入库'),
+                                "-1": __('审核不通过')
+                            },
+                            formatter: Table.api.formatter.status
+                        },
                         {field: 'adminid', title: __('Adminid')},
                         {field: 'reviewerid', title: __('Reviewerid')},
                         {field: 'stromanid', title: __('Stromanid')},
                         {field: 'storageid', title: __('Storageid')},
-                        {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
+                        {
+                            field: 'operate',
+                            title: __('Operate'),
+                            table: table,
+                            events: Table.api.events.operate,
+                            formatter: Table.api.formatter.operate
+                        }
                     ]
                 ]
             });
@@ -62,7 +80,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 }
             });
 
-            var table = $("#table");
+            const table = $("#table");
 
             // 初始化表格
             table.bootstrapTable({
