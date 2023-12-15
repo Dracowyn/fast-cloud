@@ -1,6 +1,6 @@
 <?php
 
-namespace app\common\validate\depot;
+namespace app\common\validate\depot\back;
 
 use think\Validate;
 

@@ -63,7 +63,125 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             title: __('Operate'),
                             table: table,
                             events: Table.api.events.operate,
-                            formatter: Table.api.formatter.operate
+                            formatter: Table.api.formatter.operate,
+                            buttons: [
+                                {
+                                    name: 'detail',
+                                    title: '详情',
+                                    classname: 'btn btn-xs btn-success btn-dialog',
+                                    extend: 'data-toggle="tooltip" data-container="body"',
+                                    url: 'depot/back/detail',
+                                    icon: 'fa fa-eye'
+                                },
+                                {
+                                    name: 'process',
+                                    title: '通过审核',
+                                    classname: 'btn btn-xs btn-success btn-ajax',
+                                    icon: 'fa fa-leaf',
+                                    confirm: '确认通过审核吗？',
+                                    url: 'depot/back/process',
+                                    extend: 'data-toggle="tooltip" data-container="body"',
+                                    success: function (data, ret) {
+                                        $(".btn-refresh").trigger("click");
+                                    },
+                                    error: function (err) {
+                                        console.log(err);
+                                    },
+                                    visible: function (row) {
+                                        return row.status === 0;
+                                    }
+                                },
+                                {
+                                    name: 'receipt',
+                                    title: '确认收货',
+                                    classname: 'btn btn-xs btn-success btn-ajax',
+                                    icon: 'fa fa-leaf',
+                                    confirm: '确认收货吗？',
+                                    extend: 'data-toggle="tooltip" data-container="body"',
+                                    url: 'depot/back/receipt',
+                                    success: function (data, ret) {
+                                        $(".btn-refresh").trigger("click");
+                                    },
+                                    error: function (err) {
+                                        console.log(err);
+                                    },
+                                    visible: function (row) {
+
+                                        return row.status === 1
+                                    }
+                                },
+                                {
+                                    name: 'storage',
+                                    title: '确认入库',
+                                    classname: 'btn btn-xs btn-success btn-ajax',
+                                    extend: 'data-toggle="tooltip" data-container="body"',
+                                    icon: 'fa fa-leaf',
+                                    confirm: '确认入库吗？',
+                                    url: 'depot/back/storage',
+                                    success: function (data, ret) {
+                                        $(".btn-refresh").trigger("click");
+                                    },
+                                    error: function (err) {
+                                        console.log(err);
+                                    },
+                                    visible: function (row) {
+                                        return row.status === 2
+                                    }
+                                },
+                                {
+                                    name: 'fail',
+                                    title: '未通过审核',
+                                    classname: 'btn btn-xs btn-info btn-dialog',
+                                    icon: 'fa fa-exclamation-triangle',
+                                    extend: 'data-toggle="tooltip" data-container="body"',
+                                    confirm: '确认未通过审核吗？',
+                                    url: 'depot/back/fail',
+                                    visible: function (row) {
+                                        return row.status === 0;
+                                    }
+                                },
+                                {
+                                    name: 'cancel',
+                                    title: '撤销审核',
+                                    classname: 'btn btn-xs btn-danger btn-ajax',
+                                    icon: 'fa fa-reply',
+                                    url: 'depot/back/cancel',
+                                    confirm: '确认要撤回审核吗？',
+                                    extend: 'data-toggle="tooltip" data-container="body"',
+                                    success: function (data, ret) {
+                                        $(".btn-refresh").trigger("click");
+                                    },
+                                    error: function (err) {
+                                        console.log(err);
+                                    },
+                                    visible: function (row) {
+                                        return row.status === 1;
+
+
+                                    }
+                                },
+                                {
+                                    name: 'edit',
+                                    title: '编辑',
+                                    classname: 'btn btn-xs btn-success btn-editone',
+                                    extend: 'data-toggle="tooltip" data-container="body"',
+                                    icon: 'fa fa-pencil',
+                                    url: 'depot/storage/edit',
+                                    visible: function (row) {
+                                        return !(row.status === 2 || row.status === 3);
+                                    }
+                                },
+                                {
+                                    name: 'del',
+                                    title: '删除',
+                                    classname: 'btn btn-xs btn-danger btn-delone',
+                                    extend: 'data-toggle="tooltip" data-container="body"',
+                                    icon: 'fa fa-trash',
+                                    visible: function (row) {
+                                        return !(row.status === 2 || row.status === 3);
+                                    }
+                                }
+                            ]
                         }
                     ]
                 ]
