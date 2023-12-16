@@ -6,6 +6,7 @@
 
 namespace app\common\model\business;
 
+use think\Env;
 use think\Model;
 use traits\model\SoftDelete;
 
@@ -63,7 +64,7 @@ class Business extends Model
 		if (!is_file('.' . $avatar)) {
 			$avatar = '/assets/img/avatar.png';
 		}
-		$cdn = config('site.url');
+		$cdn = Env::get('site.url', config('site.url'));
 		return $cdn . $avatar;
 	}
 
