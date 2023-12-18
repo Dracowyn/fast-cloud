@@ -2,6 +2,7 @@
 
 namespace app\common\model\product;
 
+use think\Env;
 use think\Model;
 use traits\model\SoftDelete;
 
@@ -24,7 +25,8 @@ class Product extends Model
 	// 追加属性
 	protected $append = [
 		'flag_text',
-		'status_text'
+		'status_text',
+		'thumb_cdn',
 	];
 
 
@@ -62,6 +64,20 @@ class Product extends Model
 	public function unit()
 	{
 		return $this->belongsTo('app\common\model\product\Unit', 'unitid', 'id', [], 'LEFT')->setEagerlyType(0);
+	}
+
+	// 获取商品缩略图
+	public function getThumbCdnAttr($value, $data)
+	{
+		$thumbsStr = $data['thumbs'] ?: '';
+		$thumbArr = explode(',', $thumbsStr);
+		$thumbArr = array_filter($thumbArr);
+		$thumb = $thumbArr[0] ?? '';
+		if (!is_file('.' . $thumb)) {
+			$thumb = '/assets/img/qrcode.png';
+		}
+		$cdn = Env::get('site.url', config('site.url'));
+		return $cdn . $thumb;
 	}
 
 
