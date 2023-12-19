@@ -27,6 +27,7 @@ class Product extends Model
 		'flag_text',
 		'status_text',
 		'thumb_cdn',
+		'thumbs_cdn',
 	];
 
 
@@ -80,5 +81,15 @@ class Product extends Model
 		return $cdn . $thumb;
 	}
 
-
+	// 获取商品缩略图
+	public function getThumbsCdnAttr($value, $data)
+	{
+		$thumbs = $data['thumbs'] ? explode(',', $data['thumbs']) : [];
+		$thumbs = array_filter($thumbs);
+		$cdn = Env::get('site.url', config('site.url'));
+		if (empty($thumbs)) {
+			return $cdn . '/assets/img/qrcode.png';
+		}
+		return str_replace('/uploads', $cdn . '/uploads', $thumbs);
+	}
 }
