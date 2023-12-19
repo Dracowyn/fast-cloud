@@ -11,7 +11,7 @@ use think\response\Json;
 
 class Product extends Controller
 {
-	public function thumb(): Json
+	public function thumb(): string
 	{
 		$proId = $this->request->param('proid', 0, 'trim');
 		$productModel = new \app\common\model\product\Product;
