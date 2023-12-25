@@ -119,7 +119,7 @@ class Index extends Controller
 			$money = $params['originalprice'] ?? 0;
 
 			// 查询支付表最后一次未支付记录
-			$pay = $this->PayModel->where(['status' => 0])->order('id DESC')->find();
+			$pay = $this->payModel->where(['status' => 0])->order('id DESC')->find();
 
 			// 获取最后一次支付的递减值
 			$subPrice = !empty($pay) ? bcadd(0.01, bcsub($pay['originalprice'], $pay['price'], 2), 2) : 0.01;
@@ -156,10 +156,11 @@ class Index extends Controller
 				}
 			}
 		}
+		return null;
 	}
 
 	// 创建充值订单成功后轮遍查询
-	public function status()
+	public function status(): ?Json
 	{
 		if ($this->request->isPost()) {
 			$payId = $this->request->param('payid', 0, 'trim');
@@ -179,5 +180,6 @@ class Index extends Controller
 					return json(['code' => 0, 'msg' => '订单已关闭', 'data' => $pay]);
 			}
 		}
+		return null;
 	}
 }
