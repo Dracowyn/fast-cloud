@@ -18,10 +18,10 @@ class Record extends Model
 	protected $autoWriteTimestamp = true;
 
 	// 定义创建时间的字段名
-	protected $createTime = 'create_time';
+	protected $createTime = 'createtime';
 
 	// 定义更新时间的字段名
-	protected $updateTime = 'update_time';
+	protected $updateTime = false;
 
 	// 追加不存在的字段
 	protected $append = [
@@ -30,7 +30,7 @@ class Record extends Model
 
 	public function getCreateTimeTextAttr($value, array $data)
 	{
-		$time = $data['create_time'] ?? '';
+		$time = $data['createtime'] ?? '';
 		return datetime($time);
 	}
 }
