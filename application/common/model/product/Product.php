@@ -77,7 +77,7 @@ class Product extends Model
 		if (!is_file('.' . $thumb)) {
 			$thumb = '/assets/img/qrcode.png';
 		}
-		$cdn = Env::get('site.url', config('site.url'));
+		$cdn = Env::get('site.cdn_url', config('site.cdn_url')) ?? Env::get('site.url', config('site.url'));
 		return $cdn . $thumb;
 	}
 
@@ -86,7 +86,7 @@ class Product extends Model
 	{
 		$thumbs = $data['thumbs'] ? explode(',', $data['thumbs']) : [];
 		$thumbs = array_filter($thumbs);
-		$cdn = Env::get('site.url', config('site.url'));
+		$cdn = Env::get('site.cdn_url', config('site.cdn_url')) ?? Env::get('site.url', config('site.url'));
 		if (empty($thumbs)) {
 			return $cdn . '/assets/img/qrcode.png';
 		}

@@ -64,7 +64,7 @@ class Business extends Model
 		if (!is_file('.' . $avatar)) {
 			$avatar = '/assets/img/avatar.png';
 		}
-		$cdn = Env::get('site.url', config('site.url'));
+		$cdn = Env::get('site.cdn_url', config('site.cdn_url')) ?? Env::get('site.url', config('site.url'));
 		return $cdn . $avatar;
 	}
 

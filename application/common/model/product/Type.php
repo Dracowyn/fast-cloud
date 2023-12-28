@@ -47,7 +47,7 @@ class Type extends Model
 		if (!is_file('.' . $thumb)) {
 			$thumb = '/assets/img/qrcode.png';
 		}
-		$cdn = Env::get('site.url', config('site.url'));
+		$cdn = Env::get('site.cdn_url', config('site.cdn_url')) ?? Env::get('site.url', config('site.url'));
 		return $cdn . $thumb;
 	}
 }
