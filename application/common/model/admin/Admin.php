@@ -79,16 +79,17 @@ class Admin extends Model
 	{
 		// 获取系统配置表里面的网站地址
 		$url = ConfigModel::where('name', 'url')->value('value');
+		$siteUrl = Env::get('site.url', $url);
 
-		$url = Env::get('site.url', $url);
+		$cdn = Env::get('site.cdn_url', config('site.cdn_url')) ?? Env::get('site.url', config('site.url'));
 
 		// 把admin数据表的avatar字段里把带有域名的值去掉域名
-		$avatar = str_replace($url, '', $data['avatar']);
+		$avatar = str_replace($siteUrl, '', $data['avatar']);
 
 		if (!is_file('.' . $data['avatar'])) {
 			$avatar = '/assets/img/avatar.png';
 		}
 
-		return $url . $avatar;
+		return $cdn . $avatar;
 	}
 }

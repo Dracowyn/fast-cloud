@@ -18,7 +18,7 @@ class Admin extends Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->adminModel = new \app\admin\model\Admin;
+		$this->adminModel = new \app\common\model\admin\Admin();
 	}
 
 	/**
