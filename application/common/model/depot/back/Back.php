@@ -1,6 +1,6 @@
 <?php
 
-namespace app\common\model\depot\Back;
+namespace app\common\model\depot\back;
 
 use think\Model;
 use traits\model\SoftDelete;

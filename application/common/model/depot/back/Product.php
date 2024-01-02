@@ -1,16 +1,16 @@
 <?php
 /**
  * @author Dracowyn
- * @since 2023-12-15 14:40
+ * @since 2023-12-15 14:44
  */
 
-namespace app\common\model\depot\Storage;
+namespace app\common\model\depot\back;
 
 use think\Model;
 
 class Product extends Model
 {
-	protected $name = 'depot_storage_product';
+	protected $name = 'depot_back_product';
 
 	/**
 	 * 关联查询商品

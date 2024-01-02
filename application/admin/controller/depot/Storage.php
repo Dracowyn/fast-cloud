@@ -44,11 +44,11 @@ class Storage extends Backend
 	public function _initialize()
 	{
 		parent::_initialize();
-		$this->model = new \app\common\model\depot\Storage\Storage;
+		$this->model = new \app\common\model\depot\storage\Storage;
 		$this->productModel = new Product;
 		$this->supplierModel = new \app\common\model\depot\Supplier;
-		$this->backModel = new \app\common\model\depot\Back\Back;
-		$this->depotProductModel = new \app\common\model\depot\Storage\Product;
+		$this->backModel = new \app\common\model\depot\back\Back;
+		$this->depotProductModel = new \app\common\model\depot\storage\Product;
 		$this->view->assign("typeList", $this->model->getTypeList());
 		$this->view->assign("statusList", $this->model->getStatusList());
 	}

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\common\model\depot\Storage;
+namespace app\common\model\depot\storage;
 
 use think\Model;
 use traits\model\SoftDelete;

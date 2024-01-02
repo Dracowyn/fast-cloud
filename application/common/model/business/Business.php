@@ -169,4 +169,10 @@ class Business extends Model
 	{
 		return $this->belongsTo('app\admin\model\Admin', 'adminid', 'id', [], 'LEFT')->setEagerlyType(0);
 	}
+
+	// 关联收货地址
+	public function address()
+	{
+		return $this->belongsTo('app\common\model\business\Address', 'addressid', 'id', [], 'LEFT')->setEagerlyType(0);
+	}
 }
