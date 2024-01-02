@@ -22,14 +22,14 @@ class Order extends Backend
 
 	protected $businessModel = null;
 
-	protected $orderProduct = null;
+	protected $orderProductModel = null;
 
 	public function __construct()
 	{
 		parent::__construct();
 		$this->model = new \app\common\model\product\order\Order;
 		$this->businessModel = new \app\common\model\business\Business;
-		$this->orderProduct = new \app\common\model\product\order\Product;
+		$this->orderProductModel = new \app\common\model\product\order\Product;
 		$this->view->assign("statusList", $this->model->getStatusList());
 	}
 
@@ -53,6 +53,27 @@ class Order extends Backend
 
 			return json($result);
 		}
+		return $this->view->fetch();
+	}
+
+	// 订单详情
+	public function info($ids = null)
+	{
+		$row = $this->model
+			->with(['business', 'express', 'address' => ['provinces', 'citys', 'districts'], 'sale', 'review', 'dispatched'])
+			->find($ids);
+
+		if (!$row) {
+			$this->error(__('No Results were found'));
+		}
+
+		$orderProductData = $this->orderProductModel->with(['products'])->where('orderid', $ids)->select();
+
+		$this->view->assign([
+			'row' => $row,
+			'orderProductData' => $orderProductData,
+		]);
+
 		return $this->view->fetch();
 	}
 }

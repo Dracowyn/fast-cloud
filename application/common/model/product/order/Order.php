@@ -65,19 +65,19 @@ class Order extends Model
 	// 销售员
 	public function sale(): BelongsTo
 	{
-		return $this->belongsTo('app\common\model\Admin', 'adminid', 'id', [], 'LEFT')->setEagerlyType(0);
+		return $this->belongsTo('app\common\model\admin\Admin', 'adminid', 'id', [], 'LEFT')->setEagerlyType(0);
 	}
 
 	// 审核员
 	public function review(): BelongsTo
 	{
-		return $this->belongsTo('app\common\model\Admin', 'checkmanid', 'id', [], 'LEFT')->setEagerlyType(0);
+		return $this->belongsTo('app\common\model\admin\Admin', 'checkmanid', 'id', [], 'LEFT')->setEagerlyType(0);
 	}
 
 	// 发货员
 	public function dispatched(): BelongsTo
 	{
-		return $this->belongsTo('app\common\model\Admin', 'shipmanid', 'id', [], 'LEFT')->setEagerlyType(0);
+		return $this->belongsTo('app\common\model\admin\Admin', 'shipmanid', 'id', [], 'LEFT')->setEagerlyType(0);
 	}
 
 	// 关联查询订单商品

@@ -104,7 +104,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     url: $.fn.bootstrapTable.defaults.extend.deliver_url,
                                     icon: 'fa fa-leaf',
                                     visible: function (row) {
-                                        return row.status === 1 || row.status === 2;
+                                        return row.status === '1' || row.status === '2';
                                     }
                                 },
                                 {
