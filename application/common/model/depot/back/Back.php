@@ -3,6 +3,7 @@
 namespace app\common\model\depot\back;
 
 use think\Model;
+use think\model\relation\BelongsTo;
 use traits\model\SoftDelete;
 
 class Back extends Model
@@ -150,8 +151,8 @@ class Back extends Model
 	}
 
 	// 关联查询客户
-	public function business()
+	public function business(): BelongsTo
 	{
-		return $this->belongsTo('app\common\model\Business\Business', 'busid', 'id', [], 'LEFT');
+		return $this->belongsTo('app\common\model\business\Business', 'busid', 'id', [], 'LEFT')->setEagerlyType(0);
 	}
 }
