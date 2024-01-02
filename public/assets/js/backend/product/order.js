@@ -142,7 +142,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 }
             });
 
-            var table = $("#table");
+            const table = $("#table");
 
             // 初始化表格
             table.bootstrapTable({
@@ -153,7 +153,34 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     [
                         {checkbox: true},
                         {field: 'id', title: __('Id')},
-                        {field: 'name', title: __('Name'), align: 'left'},
+                        {
+                            field: 'code',
+                            title: __('Code'),
+                            operate: 'LIKE',
+                            table: table,
+                            class: 'autocontent',
+                            formatter: Table.api.formatter.content
+                        },
+                        {field: 'amount', title: __('Amount'), operate: 'BETWEEN'},
+                        {field: 'business.nickname', title: __('Busid'), operate: 'LIKE'},
+                        {
+                            field: 'status',
+                            title: __('Status'),
+                            searchList: {
+                                "0": __('未支付'),
+                                "1": __('已支付'),
+                                "2": __('已发货'),
+                                "3": __('已收货'),
+                                "4": __('已完成'),
+                                "-1": __('仅退款'),
+                                "-2": __('退款退货'),
+                                "-3": __('售后中'),
+                                "-4": __('退货成功'),
+                                "-5": __('退货失败')
+                            },
+                            operate: 'LIKE',
+                            formatter: Table.api.formatter.status
+                        },
                         {
                             field: 'deletetime',
                             title: __('Deletetime'),
