@@ -86,6 +86,12 @@ class Order extends Model
 		return $this->belongsTo('app\common\model\product\order\Product', 'id', 'orderid', [], 'LEFT')->setEagerlyType(0);
 	}
 
+	// 关联物流
+	public function express(): BelongsTo
+	{
+		return $this->belongsTo('app\common\model\Express', 'expressid', 'id', [], 'LEFT')->setEagerlyType(0);
+	}
+
 }
 
 

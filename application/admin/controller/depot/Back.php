@@ -179,6 +179,12 @@ class Back extends Backend
 		return $this->view->fetch();
 	}
 
+	// 编辑退货单
+	public function edit()
+	{
+
+	}
+
 	// 查询订单
 	public function order()
 	{
