@@ -24,12 +24,15 @@ class Order extends Backend
 
 	protected $orderProductModel = null;
 
+	protected $expressModel = null;
+
 	public function __construct()
 	{
 		parent::__construct();
 		$this->model = new \app\common\model\product\order\Order;
 		$this->businessModel = new \app\common\model\business\Business;
 		$this->orderProductModel = new \app\common\model\product\order\Product;
+		$this->expressModel = new \app\common\model\Express;
 		$this->view->assign("statusList", $this->model->getStatusList());
 	}
 
@@ -72,6 +75,58 @@ class Order extends Backend
 		$this->view->assign([
 			'row' => $row,
 			'orderProductData' => $orderProductData,
+		]);
+
+		return $this->view->fetch();
+	}
+
+	// 发货
+	public function deliver($ids = null)
+	{
+		$row = $this->model->find($ids);
+
+		if (!$row) {
+			$this->error(__('No Results were found'));
+		}
+
+		if ($this->request->isPost()) {
+			$params = $this->request->param('row/a');
+
+			$data = [
+				'id' => $ids,
+				'expressid' => $params['expressid'],
+				'expresscode' => $params['expresscode'],
+				'shipmanid' => $this->auth->id,
+				'status' => 2,
+			];
+
+			$validate = [
+				[
+					'expressid' => 'require',
+					'expresscode' => 'require|unique:order',
+				],
+				[
+					'expressid.require' => '请选择快递公司',
+					'expresscode.require' => '请填写快递单号',
+					'expresscode.unique' => '快递单号已存在',
+				],
+			];
+
+			$result = $this->model->validate(...$validate)->isUpdate()->save($data);
+
+			if ($result === false) {
+				$this->error($this->model->getError());
+			} else {
+				$this->success('发货成功');
+			}
+		}
+
+		// 物流公司数据
+		$expressData = $this->expressModel->column('id,name');
+
+		$this->view->assign([
+			'row' => $row,
+			'expressData' => $expressData,
 		]);
 
 		return $this->view->fetch();
