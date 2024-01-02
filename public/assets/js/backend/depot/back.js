@@ -251,6 +251,97 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
         },
 
         add: function () {
+            $('#table').bootstrapTable({
+                columns:[
+                    {
+                        field: 'id',
+                        title: '主键',
+                        halign:'center',
+                        valign:'middle'
+                    },
+                    {
+                        field: 'name',
+                        title: '商品名称',
+                        halign:'center',
+                        valign:'middle'
+                    },
+                    {
+                        field: 'price',
+                        title: '商品单价',
+                        halign:'center',
+                        valign:'middle'
+                    },
+                    {
+                        field: 'nums',
+                        title: '数量',
+                        halign:'center',
+                        valign:'middle'
+                    },
+                    {
+                        field: 'total',
+                        title: '总价',
+                        halign:'center',
+                        valign:'middle'
+                    },
+                ]
+            })
+
+            $('#table').hide()
+
+            $('#c-ordercode').change(function(){
+                const code = $(this).val();
+                GetOrder(code)
+            })
+
+            function GetOrder(code)
+            {
+                $.ajax({
+                    type: "post",
+                    url: 'depot/back/order',
+                    data: {
+                        code
+                    },
+                    dataType: "json",
+                    success: function (res) {
+
+                        if(res.code === 0)
+                        {
+                            Toastr.error(res.msg)
+
+                            return false
+                        }
+
+                        $('#table').show()
+
+                        let tr = ''
+                        // SU202211181107373113749
+
+                        for(let item of res.data.orderProduct)
+                        {
+                            tr += `<tr style="text-align: center; vertical-align: middle; ">`
+                            tr += `<td>${item.products.id}</td>`
+                            tr += `<td>${item.products.name}</td>`
+                            tr += `<td>${item.price}</td>`
+                            tr += `<td>${item.nums}</td>`
+                            tr += `<td>${item.total}</td>`
+                            tr += `</tr>`
+                        }
+
+                        $('#table tbody').html(tr);
+
+                        // 收货地址
+                        let option = '';
+
+                        for(let item of res.data.addressList)
+                        {
+                            option += `<option value="${item.id}" ${item.id === res.data.order.businessaddrid ? 'selected="selected"' : ''}>联系人：${item.consignee} 联系方式：${item.mobile} 地址：${item.provinces.name}-${item.citys.name}-${item.districts.name} ${item.address}</option>`
+                        }
+
+                        $('#addressid').html(option).selectpicker('refresh')
+                    }
+                });
+            }
+
             Controller.api.bindevent();
         },
         edit: function () {

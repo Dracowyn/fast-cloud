@@ -20,9 +20,11 @@ class Address extends Model
 	protected $name = 'business_address';
 
 	protected $autoWriteTimestamp = true;
-	protected $createTime = 'create_time'; //插入的时候设置的字段名
-	protected $updateTime = 'update_time';
-	protected $deleteTime = 'delete_time';
+//	protected $createTime = 'createtime'; //插入的时候设置的字段名
+//	protected $updateTime = 'updatetime';
+	protected $createTime = false;
+	protected $updateTime = false;
+	protected $deleteTime = 'deletetime';
 
 	// 给模型定义一个关联查询
 	public function provinces()
