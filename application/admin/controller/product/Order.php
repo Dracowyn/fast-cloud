@@ -8,6 +8,7 @@
 namespace app\admin\controller\product;
 
 use app\common\controller\Backend;
+use think\Db;
 use think\Exception;
 use think\exception\DbException;
 use think\response\Json;
@@ -131,4 +132,100 @@ class Order extends Backend
 
 		return $this->view->fetch();
 	}
+
+	// 软删除
+	public function del($ids = null)
+	{
+		$ids = $ids ?: $this->request->params('ids', '', 'trim');
+
+		$row = $this->model->where('id', 'in', $ids)->select();
+
+		if (!$row) {
+			$this->error('请选择需要删除的订单');
+		}
+
+		$result = $this->model->destroy($ids);
+
+		if (!$result) {
+			$this->error('删除失败');
+		} else {
+			$this->success('删除成功');
+		}
+	}
+
+	// 回收站
+	public function recyclebin()
+	{
+		$this->request->filter(['strip_tags', 'trim']);
+
+		if ($this->request->isAjax()) {
+			if ($this->request->request('keyField')) {
+				return $this->selectpage();
+			}
+
+			[$where, $sort, $order, $offset, $limit] = $this->buildparams();
+
+			$list = $this->model
+				->onlyTrashed()
+				->with(['express', 'business'])
+				->where($where)
+				->order($sort, $order)
+				->paginate($limit);
+
+			$result = ['total' => $list->total(), 'rows' => $list->items()];
+
+			return json($result);
+		}
+		return $this->fetch();
+	}
+
+	// 恢复
+	public function restore($ids = null)
+	{
+		$ids = $ids ?: $this->request->params('ids', '', 'trim');
+		$row = $this->model->onlyTrashed()->where('id', 'in', $ids)->select();
+		if (!$row) {
+			$this->error('请选择需要还原的数据');
+		}
+		$result = $this->model->onlyTrashed()->where('id', 'in', $ids)->update(['deletetime' => null]);
+
+		if (!$result) {
+			$this->error('还原失败');
+		} else {
+			$this->success('还原成功');
+		}
+	}
+
+	// 真实删除
+	public function destroy($ids = null)
+	{
+		$ids = $ids ?: $this->request->params('ids', '', 'trim');
+		$row = $this->model->onlyTrashed()->where(['id' => ['in', $ids]])->select();
+		if (!$row) {
+			$this->error('请选择需要删除的数据');
+		}
+
+		Db::startTrans();
+		try {
+			$orderProductData = $this->orderProductModel->where(['orderid' => ['in', $ids]])->column('id');
+			$orderStatus = $this->model->destroy($ids, true);
+			if (!$orderStatus) {
+				throw new Exception(__($this->model->getError()));
+			}
+
+			$orderProductStatus = $this->orderProductModel->destroy($orderProductData);
+			if (!$orderProductStatus) {
+				throw new Exception(__($this->orderProductModel->getError()));
+			}
+
+			Db::commit();
+		} catch (Exception $e) {
+			Db::rollback();
+			$this->error($e->getMessage());
+		}
+
+		$this->success();
+	}
+
+
 }
