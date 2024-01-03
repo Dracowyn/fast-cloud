@@ -386,6 +386,82 @@ class Back extends Backend
 		}
 	}
 
+	// 确认收货
+	public function receipt()
+	{
+		if ($this->request->isAjax()) {
+			$ids = $this->request->param('ids', '');
+
+			$back = $this->model->find($ids);
+
+			if (!$back) {
+				$this->error('退货单不存在');
+			}
+
+			// 查询订单
+			$order = $this->orderModel->where(['code' => $back->ordercode])->find();
+
+			if (!$order) {
+				$this->error('订单不存在');
+			}
+
+			// 查询用户
+			$business = $this->businessModel->find($order->busid);
+
+			if (!$business) {
+				$this->error('用户不存在');
+			}
+
+			// 开启事务
+			$this->model->startTrans();
+			$this->businessModel->startTrans();
+			$this->orderModel->startTrans();
+
+			// 更新退货单状态
+			$back->status = '2';
+			$backStatus = $back->save();
+
+			if (!$backStatus) {
+				$this->model->rollback();
+				$this->error($this->model->getError());
+			}
+
+			// 更新用户余额
+			$business->money = bcadd($business->money, $back->amount, 2);
+
+			$businessStatus = $business->save();
+
+			if (!$businessStatus) {
+				$this->model->rollback();
+				$this->businessModel->rollback();
+				$this->error($this->businessModel->getError());
+			}
+
+			// 更新订单状态
+			$order->status = '-4';
+			$orderStatus = $order->save();
+
+			if (!$orderStatus) {
+				$this->model->rollback();
+				$this->businessModel->rollback();
+				$this->orderModel->rollback();
+				$this->error($this->orderModel->getError());
+			}
+
+			if ($backStatus && $businessStatus && $orderStatus) {
+				$this->model->commit();
+				$this->businessModel->commit();
+				$this->orderModel->commit();
+				$this->success('确认收货成功');
+			} else {
+				$this->model->rollback();
+				$this->businessModel->rollback();
+				$this->orderModel->rollback();
+				$this->error('确认收货失败');
+			}
+		}
+	}
+
 	// 查询订单
 	public function order()
 	{
