@@ -317,6 +317,24 @@ class Back extends Backend
 		return $this->view->fetch('', $data);
 	}
 
+	// 退货单详情
+	public function detail($ids = null)
+	{
+		$row = $this->model->with(['business'])->find($ids);
+		if (!$row) {
+			$this->error(__('No Results were found'));
+		}
+
+		$backProductList = $this->backProductModel->with(['products'])->where(['backid' => $row['id']])->select();
+
+		$data = [
+			'row' => $row,
+			'backProductList' => $backProductList,
+		];
+
+		return $this->view->fetch('', $data);
+	}
+
 	// 查询订单
 	public function order()
 	{
