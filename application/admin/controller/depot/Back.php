@@ -592,6 +592,28 @@ class Back extends Backend
 		return $this->view->fetch();
 	}
 
+	// 回收站
+	public function recyclebin()
+	{
+		$this->request->filter(['strip_tags', 'trim']);
+		if ($this->request->isAjax()) {
+			if ($this->request->request('keyField')) {
+				return $this->selectpage();
+			}
+			[$where, $sort, $order, $offset, $limit] = $this->buildparams();
+			$list = $this->model
+				->onlyTrashed()
+				->with(['business'])
+				->where($where)
+				->order($sort, $order)
+				->paginate($limit);
+
+			$result = ['total' => $list->total(), 'rows' => $list->items()];
+			return json($result);
+		}
+		return $this->view->fetch();
+	}
+
 
 	// 查询订单
 	public function order()
