@@ -334,4 +334,9 @@ class Order extends Backend
 		return $this->view->fetch();
 	}
 
+	public function edit($ids = null)
+	{
+		return null;
+	}
+
 }
