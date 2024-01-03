@@ -335,6 +335,32 @@ class Back extends Backend
 		return $this->view->fetch('', $data);
 	}
 
+	// 退货单审核通过
+	public function process()
+	{
+		if ($this->request->isAjax()) {
+			$ids = $this->request->param('ids', '');
+
+			$back = $this->model->find($ids);
+
+			if (!$back) {
+				$this->error('退货单不存在');
+			}
+
+
+			$back->status = '1';
+			$back->reviewerid = $this->auth->id;
+
+			$status = $back->save();
+
+			if (!$status) {
+				$this->error('审核失败');
+			}
+
+			$this->success('审核成功');
+		}
+	}
+
 	// 查询订单
 	public function order()
 	{
