@@ -36,11 +36,11 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {
                             checkbox: true,
                             formatter: function (value, row, index) {
-                                if (row.status === 1) {
+                                if (row.status === '1') {
                                     return {disabled: true};
-                                } else if (row.status === 2) {
+                                } else if (row.status === '2') {
                                     return {disabled: true};
-                                } else if (row.status === 3) {
+                                } else if (row.status === '3') {
                                     return {disabled: true};
                                 }
                             }
@@ -115,7 +115,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                         console.log(err);
                                     },
                                     visible: function (row) {
-                                        if (row.status === 2) {
+                                        if (row.status === '2') {
                                             return true
                                         } else if (row.status === 1) {
                                             return true
@@ -157,7 +157,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                         console.log(err);
                                     },
                                     visible: function (row) {
-                                        return row.status === 2
+                                        return row.status === '2'
                                     }
                                 },
                                 {
