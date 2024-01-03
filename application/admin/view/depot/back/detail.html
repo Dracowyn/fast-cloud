@@ -88,10 +88,12 @@
             </tr>
 
             {foreach $backProductList as $item}
-            <td>{$item.products.name}</td>
-            <td>{$item.price}</td>
-            <td>{$item.nums}</td>
-            <td>{$item.total}</td>
+            <tr>
+                <td>{$item.products.name}</td>
+                <td>{$item.price}</td>
+                <td>{$item.nums}</td>
+                <td>{$item.total}</td>
+            </tr>
             {/foreach}
         </table>
     </div>
