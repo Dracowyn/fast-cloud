@@ -33,6 +33,10 @@ class Back extends Backend
 
 	protected $orderProduct = null;
 
+	protected $storageModel = null;
+
+	protected $storageProductModel = null;
+
 	public function _initialize()
 	{
 		parent::_initialize();
@@ -42,6 +46,8 @@ class Back extends Backend
 		$this->addressModel = new Address;
 		$this->businessModel = new Business;
 		$this->orderProduct = new \app\common\model\product\order\Product;
+		$this->storageModel = new \app\common\model\depot\storage\Storage;
+		$this->storageProductModel = new \app\common\model\depot\storage\Product;
 		$this->view->assign("statusList", $this->model->getStatusList());
 	}
 
@@ -458,6 +464,97 @@ class Back extends Backend
 				$this->businessModel->rollback();
 				$this->orderModel->rollback();
 				$this->error('确认收货失败');
+			}
+		}
+	}
+
+	// 确认入库
+	public function storage()
+	{
+		if ($this->request->isAjax()) {
+			$ids = $this->request->param('ids', '');
+
+			$back = $this->model->find($ids);
+
+			if (!$back) {
+				$this->error('退货单不存在');
+			}
+
+			// 查询退货单商品列表
+			$orderProducts = $this->backProductModel->where(['backid' => $back->id])->select();
+			if (!$orderProducts) {
+				$this->error('退货单不存在商品');
+			}
+
+			// 开启事务
+			$this->model->startTrans();
+			$this->storageModel->startTrans();
+			$this->storageProductModel->startTrans();
+
+			// 封装入库数据
+			$storageData = [
+				'code' => build_order('SU'),
+				'type' => 2,
+				'amount' => $back['amount'],
+				'status' => '0'
+			];
+
+			// 添加入库单
+			$storageStatus = $this->storageModel->validate('common/depot/storage/Storage.back')->save($storageData);
+
+			if (!$storageStatus) {
+				$this->model->rollback();
+				$this->error($this->storageModel->getError());
+			}
+
+			// 封装入库商品数据
+			$storageProducts = [];
+
+			foreach ($orderProducts as $item) {
+				$storageProducts[] = [
+					'storageid' => $this->storageModel->id,
+					'proid' => $item['proid'],
+					'nums' => $item['nums'],
+					'price' => $item['price'],
+					'total' => $item['total']
+				];
+			}
+
+			// 添加入库商品
+			$storageProductStatus = $this->storageProductModel->validate('common/depot/storage/Product')->saveAll($storageProducts);
+
+			if (!$storageProductStatus) {
+				$this->model->rollback();
+				$this->storageModel->rollback();
+				$this->error($this->storageProductModel->getError());
+			}
+
+			// 更新退货单状态
+			$backData = [
+				'status' => '3',
+				'stromanid' => $this->auth->id,
+				'storageid' => $this->storageModel->id,
+			];
+
+			$backStatus = $back->save($backData);
+
+			if (!$backStatus) {
+				$this->model->rollback();
+				$this->storageModel->rollback();
+				$this->storageProductModel->rollback();
+				$this->error($this->model->getError());
+			}
+
+			if ($storageStatus && $storageProductStatus && $backStatus) {
+				$this->model->commit();
+				$this->storageModel->commit();
+				$this->storageProductModel->commit();
+				$this->success('确认入库成功');
+			} else {
+				$this->model->rollback();
+				$this->storageModel->rollback();
+				$this->storageProductModel->rollback();
+				$this->error('确认入库失败');
 			}
 		}
 	}
