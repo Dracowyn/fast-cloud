@@ -180,9 +180,141 @@ class Back extends Backend
 	}
 
 	// 编辑退货单
-	public function edit()
+	public function edit($ids = null)
 	{
+		$row = $this->model->with(['business'])->find($ids);
+		if (!$row) {
+			$this->error(__('No Results were found'));
+		}
 
+		if ($this->request->isPost()) {
+			$params = $this->request->param('row/a');
+
+			$this->model->startTrans();
+			$this->backProductModel->startTrans();
+
+			// 查询订单
+			$order = $this->orderModel->where(['code' => $params['ordercode']])->find();
+
+			// 判断订单是否存在
+			if (!$order) {
+				$this->error('订单不存在');
+			}
+
+			// 查询订单关联商品
+			$orderProducts = $this->orderProduct->where(['orderid' => $order->id])->select();
+			if (!$orderProducts) {
+				$this->error('订单不存在商品');
+			}
+
+			// 封装退货单数据
+			$backData = [
+				'id' => $ids,
+				'code' => $order->code,
+				'ordercode' => $params['ordercode'],
+				'busid' => $order->busid,
+				'remark' => $params['remark'],
+				'amount' => $order->amount,
+				'status' => $row['status'],
+				'adminid' => $this->auth->id,
+			];
+
+			// 查询地址
+			$address = $this->addressModel->where(['id' => $params['addressid']])->find();
+
+			if (!$address) {
+				$this->error('请选择联系人以及地址');
+			}
+
+			// 合并地址数据
+			$backData = array_merge($backData, [
+				'address' => $address->address,
+				'contact' => $address->consignee,
+				'phone' => $address->mobile,
+				'province' => $address->province,
+				'city' => $address->city,
+				'district' => $address->district,
+			]);
+
+			// 更新退货单
+			$backStatus = $this->model->validate('common/depot/back/Back')->isUpdate()->save($backData);
+
+			if (!$backStatus) {
+				$this->model->rollback();
+				$this->error($this->model->getError());
+			}
+
+			// 默认退货订单状态
+			$backProductStatus = true;
+
+			// 判断单号是否修改
+			if ($params['ordercode'] !== $row['ordercode']) {
+				// 封装退货单商品数据
+				$backProducts = [];
+				foreach ($orderProducts as $item) {
+					$backProducts[] = [
+						'backid' => $this->model->id,
+						'proid' => $item['proid'],
+						'nums' => $item['nums'],
+						'price' => $item['price'],
+						'total' => $item['total']
+					];
+				}
+
+				// 保存退货单商品
+				$backProductStatus = $this->backProductModel->validate('common/depot/back/BackProduct')->saveAll($backProducts);
+			}
+
+			if (!$backProductStatus) {
+				$this->model->rollback();
+				$this->backProductModel->rollback();
+				$this->error($this->backProductModel->getError());
+			}
+
+			if ($backStatus && $backProductStatus) {
+				$this->model->commit();
+				$this->backProductModel->commit();
+				$this->success('退货单修改成功');
+			} else {
+				$this->model->rollback();
+				$this->backProductModel->rollback();
+				$this->error('退货单修改失败');
+			}
+		}
+
+		$addressWhere = [
+			'busid' => $row->busid,
+			'consignee' => $row->contact,
+			'mobile' => $row->phone,
+			'address' => $row->address,
+			'province' => $row->province,
+			'city' => $row->city,
+			'district' => $row->district,
+		];
+
+		$addressId = $this->addressModel->where($addressWhere)->value('id');
+
+		$row['addressid'] = $addressId;
+
+		$backProductList = $this->backProductModel->with(['products'])->where(['backid' => $row['id']])->select();
+
+		$addressData = $this->addressModel->with(['provinces', 'citys', 'districts'])->where(['busid' => $row->busid])->select();
+
+		// 封装下拉地址数据
+		$addressList = [];
+
+		foreach ($addressData as $key => $item) {
+			$addressList[$item['id']] = "联系人：{$item['consignee']} 联系方式：{$item['mobile']} 地址：{$item['provinces']['name']}-{$item['citys']['name']}-{$item['districts']['name']} {$item['address']}";
+		}
+
+		$this->assignconfig('back', ['backProductList' => $backProductList]);
+
+		$data = [
+			'row' => $row,
+			'addressList' => $addressList,
+		];
+
+		return $this->view->fetch('', $data);
 	}
 
 	// 查询订单
@@ -199,7 +331,7 @@ class Back extends Backend
 
 			$orderProduct = $this->orderProduct->with(['products'])->where(['orderid' => $order->id])->select();
 
-			$addressList = $this->addressModel->with(['provinces','citys','districts'])->where(['busid' => $order->busid])->select();
+			$addressList = $this->addressModel->with(['provinces', 'citys', 'districts'])->where(['busid' => $order->busid])->select();
 
 			$this->success('查询成功', null, [
 				'order' => $order,
