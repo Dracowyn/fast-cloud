@@ -227,5 +227,116 @@ class Order extends Backend
 		$this->success();
 	}
 
+	// 退款
+	public function refund($ids = null)
+	{
+		$ids = $ids ?: $this->request->params('ids', '', 'trim');
+		$row = $this->model->find($ids);
+		if (!$row) {
+			$this->error('订单不存在');
+		}
+
+		if ($this->request->isPost()) {
+			$params = $this->request->param('row/a');
+
+			if (empty($params['examinereason']) && $params['refund'] == 0) {
+				$this->error('请填写审核不通过原因');
+			}
+
+			// 同意仅退款
+			if ($params['refund'] === '1' && $row['status'] === '-1') {
+				$business = $this->businessModel->find($row['busid']);
+
+				if (!$business) {
+					$this->error('用户不存在');
+				}
+
+				// 开启事务
+				$this->businessModel->startTrans();
+				$this->model->startTrans();
+
+				// 更新用户余额
+				$businessData = [
+					'id' => $row['busid'],
+					'money' => bcadd($business['money'], $row['amount'], 2),
+				];
+
+				$businessStatus = $this->businessModel->isUpdate()->save($businessData);
+
+				if (!$businessStatus) {
+					$this->businessModel->rollback();
+					$this->error($this->businessModel->getError());
+				}
+
+				// 更新订单状态
+				$orderData = [
+					'id' => $ids,
+					'status' => '-4',
+				];
+
+				$orderStatus = $this->model->isUpdate()->save($orderData);
+
+				if (!$orderStatus) {
+					$this->businessModel->rollback();
+					$this->model->rollback();
+					$this->error($this->model->getError());
+				}
+
+				if ($businessStatus && $orderStatus) {
+					$this->businessModel->commit();
+					$this->model->commit();
+					$this->success('退款成功');
+				} else {
+					$this->businessModel->rollback();
+					$this->model->rollback();
+					$this->error('退款失败');
+				}
+			}
+
+			// 同意退货退款
+			if ($params['refund'] === '1' && $row['status'] === '-2') {
+				$data = [
+					'id' => $ids,
+					'status' => '-3',
+				];
+
+				$result = $this->model->isUpdate()->save($data);
+
+				if ($result === false) {
+					$this->error($this->model->getError());
+				} else {
+					$this->success('操作成功');
+				}
+			}
+
+			// 拒绝退款
+			if ($params['refund'] === '0' && $row['status'] === '-1') {
+				$data = [
+					'id' => $ids,
+					'status' => '-5',
+					'examinereason' => $params['examinereason'],
+				];
+
+				$result = $this->model->isUpdate()->save($data);
+
+				if ($result === false) {
+					$this->error($this->model->getError());
+				} else {
+					$this->success('操作成功');
+				}
+			}
+		}
+
+		$this->view->assign([
+			'row' => $row,
+		]);
+
+		return $this->view->fetch();
+	}
+
+	public function edit()
+	{
+		return null;
+	}
 
 }
