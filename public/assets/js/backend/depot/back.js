@@ -54,10 +54,6 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             },
                             formatter: Table.api.formatter.status
                         },
-                        {field: 'adminid', title: __('Adminid')},
-                        {field: 'reviewerid', title: __('Reviewerid')},
-                        {field: 'stromanid', title: __('Stromanid')},
-                        {field: 'storageid', title: __('Storageid')},
                         {
                             field: 'operate',
                             title: __('Operate'),
