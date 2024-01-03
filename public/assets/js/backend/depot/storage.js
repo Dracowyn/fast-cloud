@@ -176,7 +176,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     icon: 'fa fa-pencil',
                                     url: 'depot/storage/edit',
                                     visible: function (row) {
-                                        return row.status !== 3
+                                        return row.status !== '3'
                                     }
                                 },
                                 {
@@ -186,7 +186,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     extend: 'data-toggle="tooltip" data-container="body"',
                                     icon: 'fa fa-trash',
                                     visible: function (row) {
-                                        return row.status !== 3
+                                        return row.status !== '3'
                                     }
                                 }
                             ]
