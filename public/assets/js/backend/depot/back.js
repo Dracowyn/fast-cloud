@@ -88,7 +88,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                         console.log(err);
                                     },
                                     visible: function (row) {
-                                        return row.status === 0;
+                                        return row.status === '0';
                                     }
                                 },
                                 {
@@ -107,7 +107,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     },
                                     visible: function (row) {
 
-                                        return row.status === 1
+                                        return row.status === '1'
                                     }
                                 },
                                 {
@@ -125,7 +125,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                         console.log(err);
                                     },
                                     visible: function (row) {
-                                        return row.status === 2
+                                        return row.status === '2'
                                     }
                                 },
                                 {
@@ -137,7 +137,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     confirm: '确认未通过审核吗？',
                                     url: 'depot/back/fail',
                                     visible: function (row) {
-                                        return row.status === 0;
+                                        return row.status === '0';
                                     }
                                 },
                                 {
@@ -155,7 +155,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                         console.log(err);
                                     },
                                     visible: function (row) {
-                                        return row.status === 1;
+                                        return row.status === '1';
 
 
                                     }
@@ -168,7 +168,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     icon: 'fa fa-pencil',
                                     url: 'depot/storage/edit',
                                     visible: function (row) {
-                                        return !(row.status === 2 || row.status === 3);
+                                        return !(row.status === '2' || row.status === '3');
                                     }
                                 },
                                 {
@@ -178,7 +178,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     extend: 'data-toggle="tooltip" data-container="body"',
                                     icon: 'fa fa-trash',
                                     visible: function (row) {
-                                        return !(row.status === 2 || row.status === 3);
+                                        return !(row.status === '2' || row.status === '3');
                                     }
                                 }
                             ]
