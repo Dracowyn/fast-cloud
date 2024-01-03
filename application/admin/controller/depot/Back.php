@@ -559,6 +559,40 @@ class Back extends Backend
 		}
 	}
 
+	// 退货单拒审
+	public function fail()
+	{
+
+		$ids = $this->request->param('ids', '');
+		$row = $this->model->find($ids);
+		if (!$row) {
+			$this->error(__('No Results were found'));
+		}
+
+		if ($this->request->isPost()) {
+			$params = $this->request->param('row/a');
+
+			if ($params['reason'] == '') {
+				$this->error('请填写拒审原因');
+			}
+
+			$row->status = '-1';
+			$row->reviewerid = $this->auth->id;
+			$row->reason = $params['reason'];
+
+			$status = $row->save();
+
+			if (!$status) {
+				$this->error('拒审失败');
+			} else {
+				$this->success('拒审成功');
+			}
+		}
+
+		return $this->view->fetch();
+	}
+
+
 	// 查询订单
 	public function order()
 	{
