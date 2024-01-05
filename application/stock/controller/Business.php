@@ -19,10 +19,38 @@ class Business extends Controller
 {
 	protected $adminModel = null;
 
+	protected $businessModel = null;
+
 	public function __construct()
 	{
 		parent::__construct();
 		$this->adminModel = new \app\common\model\admin\Admin;
+		$this->businessModel = new \app\common\model\business\Business;
+	}
+
+
+	/**
+	 * 获取客户头像
+	 * @return mixed|null
+	 * @throws DataNotFoundException
+	 * @throws ModelNotFoundException
+	 * @throws DbException
+	 */
+	public function avatar()
+	{
+		if ($this->request->isPost()) {
+			$id = $this->request->param('id', 0, 'trim');
+
+			$business = $this->businessModel->find($id);
+
+			if (!$business) {
+				return null;
+			}
+
+			return $business['avatar_cdn'];
+		}
+
+		return null;
 	}
 
 	/**
@@ -32,7 +60,7 @@ class Business extends Controller
 	 * @throws DbException
 	 * @throws ModelNotFoundException
 	 */
-	public function upload()
+	public function upload(): ?Json
 	{
 		if ($this->request->isPost()) {
 			$adminId = $this->request->param('adminid', 0, 'trim');
